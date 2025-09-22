@@ -5,26 +5,6 @@ export interface TimeRange {
   minutes: number;
 }
 
-export interface TradingParameters {
-  macros: {
-    london: { start: TimeRange; end: TimeRange };
-    newYorkAM: { start: TimeRange; end: TimeRange };
-    newYorkPM: { start: TimeRange; end: TimeRange };
-  };
-  killzones: {
-    london: { start: TimeRange; end: TimeRange };
-    newYork: { start: TimeRange; end: TimeRange };
-  };
-  sessions: {
-    premarket: { start: TimeRange; end: TimeRange };
-    lunch: { start: TimeRange; end: TimeRange };
-  };
-  newsEvents: Array<{
-    time: TimeRange;
-    name: string;
-    impact: 'high' | 'medium' | 'low';
-  }>;
-}
 
 export interface TimeBlock {
   type: 'macro' | 'killzone' | 'premarket' | 'lunch' | 'news' | 'inactive';
@@ -35,21 +15,84 @@ export interface TimeBlock {
   endMinute: number;
 }
 
+export interface MacroSession {
+  id: string;
+  name: string;
+  start: TimeRange;
+  end: TimeRange;
+}
+
+export interface NewsEvent {
+  id: string;
+  time: TimeRange;
+  name: string;
+  impact: 'high' | 'medium' | 'low';
+}
+
+export interface TradingParameters {
+  macros: MacroSession[];
+  killzones: {
+    london: { start: TimeRange; end: TimeRange };
+    newYork: { start: TimeRange; end: TimeRange };
+  };
+  sessions: {
+    premarket: { start: TimeRange; end: TimeRange };
+    lunch: { start: TimeRange; end: TimeRange };
+  };
+  newsEvents: NewsEvent[];
+}
+
 export const defaultTradingParameters: TradingParameters = {
-  macros: {
-    london: { 
-      start: { hours: 2, minutes: 0 }, 
-      end: { hours: 5, minutes: 0 } 
+  macros: [
+    {
+      id: 'london-1',
+      name: 'London Session 1',
+      start: { hours: 9, minutes: 33 },
+      end: { hours: 10, minutes: 0 }
     },
-    newYorkAM: { 
-      start: { hours: 8, minutes: 30 }, 
-      end: { hours: 11, minutes: 0 } 
+    {
+      id: 'london-2', 
+      name: 'London Session 2',
+      start: { hours: 11, minutes: 3 },
+      end: { hours: 11, minutes: 30 }
     },
-    newYorkPM: { 
-      start: { hours: 13, minutes: 30 }, 
-      end: { hours: 16, minutes: 0 } 
+    {
+      id: 'ny-am-1',
+      name: 'NY AM 1',
+      start: { hours: 15, minutes: 50 },
+      end: { hours: 16, minutes: 10 }
+    },
+    {
+      id: 'ny-am-2',
+      name: 'NY AM 2', 
+      start: { hours: 16, minutes: 50 },
+      end: { hours: 17, minutes: 10 }
+    },
+    {
+      id: 'ny-am-3',
+      name: 'NY AM 3',
+      start: { hours: 17, minutes: 50 },
+      end: { hours: 18, minutes: 10 }
+    },
+    {
+      id: 'ny-midday',
+      name: 'NY Midday',
+      start: { hours: 18, minutes: 50 },
+      end: { hours: 19, minutes: 10 }
+    },
+    {
+      id: 'ny-pm',
+      name: 'NY PM',
+      start: { hours: 20, minutes: 10 },
+      end: { hours: 20, minutes: 40 }
+    },
+    {
+      id: 'ny-closing',
+      name: 'NY Closing',
+      start: { hours: 22, minutes: 15 },
+      end: { hours: 22, minutes: 45 }
     }
-  },
+  ],
   killzones: {
     london: { 
       start: { hours: 6, minutes: 0 }, 
@@ -72,13 +115,15 @@ export const defaultTradingParameters: TradingParameters = {
   },
   newsEvents: [
     {
+      id: 'fomc',
       time: { hours: 15, minutes: 30 },
       name: "FOMC Meeting",
       impact: 'high'
     },
     {
+      id: 'nfp',
       time: { hours: 12, minutes: 0 },
-      name: "NFP Release",
+      name: "NFP Release", 
       impact: 'high'
     }
   ]
@@ -88,31 +133,15 @@ export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] =
   const blocks: TimeBlock[] = [];
   
   // Add macros
-  blocks.push({
-    type: 'macro',
-    name: 'London',
-    startHour: parameters.macros.london.start.hours,
-    startMinute: parameters.macros.london.start.minutes,
-    endHour: parameters.macros.london.end.hours,
-    endMinute: parameters.macros.london.end.minutes
-  });
-  
-  blocks.push({
-    type: 'macro',
-    name: 'NY AM',
-    startHour: parameters.macros.newYorkAM.start.hours,
-    startMinute: parameters.macros.newYorkAM.start.minutes,
-    endHour: parameters.macros.newYorkAM.end.hours,
-    endMinute: parameters.macros.newYorkAM.end.minutes
-  });
-  
-  blocks.push({
-    type: 'macro',
-    name: 'NY PM',
-    startHour: parameters.macros.newYorkPM.start.hours,
-    startMinute: parameters.macros.newYorkPM.start.minutes,
-    endHour: parameters.macros.newYorkPM.end.hours,
-    endMinute: parameters.macros.newYorkPM.end.minutes
+  parameters.macros.forEach(macro => {
+    blocks.push({
+      type: 'macro',
+      name: macro.name,
+      startHour: macro.start.hours,
+      startMinute: macro.start.minutes,
+      endHour: macro.end.hours,
+      endMinute: macro.end.minutes
+    });
   });
   
   // Add killzones

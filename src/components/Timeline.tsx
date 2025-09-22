@@ -65,57 +65,146 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
           ))}
         </div>
         
-        {/* Timeline track */}
-        <div className="relative h-16 bg-secondary rounded-lg overflow-hidden">
-          {/* Time blocks */}
-          {timeBlocks.map((block, index) => {
-            const startMinutes = block.startHour * 60 + block.startMinute;
-            const endMinutes = block.endHour * 60 + block.endMinute;
-            const left = (startMinutes / (24 * 60)) * 100;
-            const width = ((endMinutes - startMinutes) / (24 * 60)) * 100;
-            
-            return (
-              <div
-                key={index}
-                className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-80 
-                           hover:opacity-100 transition-opacity cursor-pointer group`}
-                style={{ left: `${left}%`, width: `${width}%` }}
-                title={`${getBlockLabel(block)} - ${formatTime(block.startHour, block.startMinute)} to ${formatTime(block.endHour, block.endMinute)}`}
-              >
-                {/* Block label */}
-                {width > 8 && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs font-medium text-white px-1 bg-black/20 rounded">
-                      {block.name}
-                    </span>
-                  </div>
-                )}
-                
-                {/* Tooltip on hover */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
-                               px-2 py-1 bg-popover text-popover-foreground text-xs rounded 
-                               shadow-lg opacity-0 group-hover:opacity-100 transition-opacity 
-                               whitespace-nowrap z-10">
-                  {getBlockLabel(block)}
-                  <br />
-                  {formatTime(block.startHour, block.startMinute)} - {formatTime(block.endHour, block.endMinute)}
-                </div>
-              </div>
-            );
-          })}
-          
-          {/* Current time marker */}
-          <div
-            className="absolute top-0 h-full w-0.5 bg-primary z-20"
-            style={{ left: `${currentPosition}%` }}
-          >
-            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 
-                           w-3 h-3 bg-primary rounded-full border-2 border-background"></div>
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 
-                           px-1 py-0.5 bg-primary text-primary-foreground text-xs rounded 
-                           whitespace-nowrap">
-              {currentTime}
+        {/* Timeline tracks */}
+        <div className="space-y-2">
+          {/* Macros track */}
+          <div className="relative h-8 bg-secondary/50 rounded-md overflow-hidden">
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+              Macros
             </div>
+            {timeBlocks
+              .filter(block => block.type === 'macro')
+              .map((block, index) => {
+                const startMinutes = block.startHour * 60 + block.startMinute;
+                const endMinutes = block.endHour * 60 + block.endMinute;
+                const left = (startMinutes / (24 * 60)) * 100;
+                const width = ((endMinutes - startMinutes) / (24 * 60)) * 100;
+                
+                return (
+                  <div
+                    key={`macro-${index}`}
+                    className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
+                               hover:opacity-100 transition-opacity cursor-pointer group`}
+                    style={{ left: `${left}%`, width: `${width}%` }}
+                    title={`${getBlockLabel(block)} - ${formatTime(block.startHour, block.startMinute)} to ${formatTime(block.endHour, block.endMinute)}`}
+                  >
+                    {width > 6 && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-xs font-medium text-white px-1 bg-black/20 rounded truncate">
+                          {block.name}
+                        </span>
+                      </div>
+                    )}
+                    
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                                   px-2 py-1 bg-popover text-popover-foreground text-xs rounded 
+                                   shadow-lg opacity-0 group-hover:opacity-100 transition-opacity 
+                                   whitespace-nowrap z-30">
+                      {getBlockLabel(block)}
+                      <br />
+                      {formatTime(block.startHour, block.startMinute)} - {formatTime(block.endHour, block.endMinute)}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+
+          {/* Killzones track */}
+          <div className="relative h-8 bg-secondary/50 rounded-md overflow-hidden">
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+              Killzones
+            </div>
+            {timeBlocks
+              .filter(block => block.type === 'killzone')
+              .map((block, index) => {
+                const startMinutes = block.startHour * 60 + block.startMinute;
+                const endMinutes = block.endHour * 60 + block.endMinute;
+                const left = (startMinutes / (24 * 60)) * 100;
+                const width = ((endMinutes - startMinutes) / (24 * 60)) * 100;
+                
+                return (
+                  <div
+                    key={`killzone-${index}`}
+                    className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
+                               hover:opacity-100 transition-opacity cursor-pointer group`}
+                    style={{ left: `${left}%`, width: `${width}%` }}
+                    title={`${getBlockLabel(block)} - ${formatTime(block.startHour, block.startMinute)} to ${formatTime(block.endHour, block.endMinute)}`}
+                  >
+                    {width > 6 && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-xs font-medium text-white px-1 bg-black/20 rounded truncate">
+                          {block.name}
+                        </span>
+                      </div>
+                    )}
+                    
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                                   px-2 py-1 bg-popover text-popover-foreground text-xs rounded 
+                                   shadow-lg opacity-0 group-hover:opacity-100 transition-opacity 
+                                   whitespace-nowrap z-30">
+                      {getBlockLabel(block)}
+                      <br />
+                      {formatTime(block.startHour, block.startMinute)} - {formatTime(block.endHour, block.endMinute)}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+
+          {/* Sessions & News track */}
+          <div className="relative h-8 bg-secondary/50 rounded-md overflow-hidden">
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
+              Sessions
+            </div>
+            {timeBlocks
+              .filter(block => ['premarket', 'lunch', 'news'].includes(block.type))
+              .map((block, index) => {
+                const startMinutes = block.startHour * 60 + block.startMinute;
+                const endMinutes = block.endHour * 60 + block.endMinute;
+                const left = (startMinutes / (24 * 60)) * 100;
+                const width = ((endMinutes - startMinutes) / (24 * 60)) * 100;
+                
+                return (
+                  <div
+                    key={`session-${index}`}
+                    className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
+                               hover:opacity-100 transition-opacity cursor-pointer group`}
+                    style={{ left: `${left}%`, width: `${width}%` }}
+                    title={`${getBlockLabel(block)} - ${formatTime(block.startHour, block.startMinute)} to ${formatTime(block.endHour, block.endMinute)}`}
+                  >
+                    {width > 6 && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-xs font-medium text-white px-1 bg-black/20 rounded truncate">
+                          {block.name}
+                        </span>
+                      </div>
+                    )}
+                    
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                                   px-2 py-1 bg-popover text-popover-foreground text-xs rounded 
+                                   shadow-lg opacity-0 group-hover:opacity-100 transition-opacity 
+                                   whitespace-nowrap z-30">
+                      {getBlockLabel(block)}
+                      <br />
+                      {formatTime(block.startHour, block.startMinute)} - {formatTime(block.endHour, block.endMinute)}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+          
+        {/* Current time marker */}
+        <div
+          className="absolute top-0 bottom-0 w-0.5 bg-primary z-40 pointer-events-none"
+          style={{ left: `${currentPosition}%` }}
+        >
+          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 
+                         w-3 h-3 bg-primary rounded-full border-2 border-background"></div>
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 
+                         px-2 py-1 bg-primary text-primary-foreground text-xs rounded 
+                         whitespace-nowrap shadow-lg">
+            {currentTime}
           </div>
         </div>
         
