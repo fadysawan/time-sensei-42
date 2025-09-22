@@ -37,26 +37,41 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     const [hours, minutes] = value.split(':').map(Number);
     if (isNaN(hours) || isNaN(minutes)) return;
     
-    setLocalParams(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: { hours, minutes }
-      }
-    }));
+    // Handle nested field paths like "london.start" or "newYork.end"
+    if (field.includes('.')) {
+      const [subSection, timeField] = field.split('.');
+      setLocalParams(prev => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [subSection]: {
+            ...prev[section][subSection as keyof typeof prev[section]],
+            [timeField]: { hours, minutes }
+          }
+        }
+      }));
+    } else {
+      // Handle direct field access
+      setLocalParams(prev => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [field]: { hours, minutes }
+        }
+      }));
+    }
   };
 
   const handleMacroChange = (index: number, field: string, value: string) => {
     const newMacros = [...localParams.macros];
     if (field === 'name') {
       newMacros[index] = { ...newMacros[index], [field]: value };
-    } else if (field.includes('.')) {
-      const [timeField, prop] = field.split('.');
+    } else if (field === 'start' || field === 'end') {
       const [hours, minutes] = value.split(':').map(Number);
       if (!isNaN(hours) && !isNaN(minutes)) {
         newMacros[index] = {
           ...newMacros[index],
-          [timeField]: { hours, minutes }
+          [field]: { hours, minutes }
         };
       }
     }
