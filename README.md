@@ -1,8 +1,46 @@
-# Welcome to your Lovable project
+# Time Sensei - Trading Time Tracker
+
+A sophisticated trading time tracker application designed for forex/financial market traders following ICT (Inner Circle Trader) methodology.
+
+## 🚀 Live Demo
+
+Visit the live application: [https://khsawan.github.io/time-sensei-42/](https://khsawan.github.io/time-sensei-42/)
+
+## Features
+
+- **Traffic Light Trading System**: Visual indicators for optimal trading times
+- **ICT Macro Tracking**: 8 daily macro sessions for precise entry timing  
+- **Killzone Monitoring**: London and New York killzone periods
+- **Real-time Timeline**: Interactive 24-hour visualization of all trading periods
+- **Beirut Time Zone**: All sessions calibrated to GMT+2
+- **News Event Alerts**: High-impact news event notifications
+- **Customizable Settings**: Adjustable trading parameters
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/b87d150d-5387-4d5b-8e43-c448ff700afb
+
+## Deployment
+
+This project is automatically deployed to GitHub Pages using GitHub Actions. The deployment happens on every push to the main branch.
+
+### Manual Deployment Steps
+
+If you need to deploy manually:
+
+1. **Build for production:**
+   ```sh
+   npm run build:gh-pages
+   ```
+
+2. **Deploy the `dist` folder to GitHub Pages**
+
+### GitHub Pages Setup
+
+1. Go to your repository settings
+2. Navigate to "Pages" section  
+3. Set source to "GitHub Actions"
+4. The site will be available at `https://khsawan.github.io/time-sensei-42/`
 
 ## How can I edit this code?
 
@@ -59,10 +97,6 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/b87d150d-5387-4d5b-8e43-c448ff700afb) and click on Share -> Publish.
 
 ## Can I connect a custom domain to my Lovable project?
 

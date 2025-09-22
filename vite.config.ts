@@ -5,6 +5,8 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Set the base path for GitHub Pages
+  base: process.env.NODE_ENV === 'production' ? '/time-sensei-42/' : '/',
   server: {
     host: "::",
     port: 8080,
