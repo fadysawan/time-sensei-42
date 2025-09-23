@@ -40,7 +40,7 @@ const CompactEvent: React.FC<CompactEventProps> = ({ title, icon, event, nextEve
   return (
     <div className="border-b border-border/50 last:border-0">
       <div 
-        className="flex items-center justify-between py-1.5 cursor-pointer hover:bg-muted/30 transition-colors"
+        className="flex items-center justify-between py-1.5 cursor-pointer trading-hover rounded-md px-2 -mx-2"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center space-x-2 flex-1 min-w-0">
@@ -50,8 +50,8 @@ const CompactEvent: React.FC<CompactEventProps> = ({ title, icon, event, nextEve
               <span className="text-xs font-medium truncate">{event.name}</span>
               {event.impact && (
                 <span className={`w-1 h-1 rounded-full flex-shrink-0 ${
-                  event.impact === 'high' ? 'bg-red-500' : 
-                  event.impact === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                  event.impact === 'high' ? 'bg-red-400' : 
+                  event.impact === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
                 }`} />
               )}
               {futureEvents.length > 0 && (
@@ -64,7 +64,7 @@ const CompactEvent: React.FC<CompactEventProps> = ({ title, icon, event, nextEve
               {formatTime(event.startTime.hours, event.startTime.minutes)}
               {event.region && ` • ${event.region}`}
               {nextEvent && (
-                <span className="ml-1 text-muted-foreground/70">
+                <span className="ml-1 text-blue-400/70">
                   • Next: {formatTime(nextEvent.startTime.hours, nextEvent.startTime.minutes)}
                 </span>
               )}
@@ -73,8 +73,8 @@ const CompactEvent: React.FC<CompactEventProps> = ({ title, icon, event, nextEve
         </div>
         <div className="flex items-center space-x-2">
           <div className={`text-xs font-mono ${
-            countdownInfo.isUrgent ? 'text-red-500' : 
-            countdownInfo.isSoon ? 'text-yellow-500' : 'text-muted-foreground'
+            countdownInfo.isUrgent ? 'countdown-urgent' : 
+            countdownInfo.isSoon ? 'countdown-soon' : 'countdown-normal'
           }`}>
             {countdownInfo.display}
           </div>
@@ -88,26 +88,29 @@ const CompactEvent: React.FC<CompactEventProps> = ({ title, icon, event, nextEve
 
       {isExpanded && futureEvents.length > 0 && (
         <div className="pb-2 pl-6 pr-2">
-          <div className="text-xs font-medium text-muted-foreground mb-1">Upcoming {title}s</div>
+          <div className="text-xs font-medium text-blue-400/80 mb-1">Upcoming {title}s</div>
           <div className="space-y-1">
             {futureEvents.slice(0, 4).map((futureEvent, index) => {
               const futureCountdownInfo = formatCountdownDetailed(futureEvent.timeUntilMinutes);
               
               return (
-                <div key={index} className="flex items-center justify-between py-0.5">
+                <div key={index} className="flex items-center justify-between py-0.5 trading-hover rounded px-2 -mx-2">
                   <div className="flex items-center space-x-1 flex-1 min-w-0">
                     <span className="text-xs truncate">{futureEvent.name}</span>
                     {futureEvent.impact && (
                       <span className={`w-1 h-1 rounded-full flex-shrink-0 ${
-                        futureEvent.impact === 'high' ? 'bg-red-500' : 
-                        futureEvent.impact === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                        futureEvent.impact === 'high' ? 'bg-red-400' : 
+                        futureEvent.impact === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
                       }`} />
                     )}
                     <span className="text-xs text-muted-foreground">
                       • {formatTime(futureEvent.startTime.hours, futureEvent.startTime.minutes)}
                     </span>
                   </div>
-                  <div className="text-xs font-mono text-muted-foreground ml-2">
+                  <div className={`text-xs font-mono ml-2 ${
+                    futureCountdownInfo.isUrgent ? 'text-red-400' : 
+                    futureCountdownInfo.isSoon ? 'text-yellow-400' : 'text-muted-foreground'
+                  }`}>
                     {futureCountdownInfo.display}
                   </div>
                 </div>
@@ -212,15 +215,15 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
   }, [parameters]);
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
+    <div className="trading-card p-4 trading-hover">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold">Upcoming Events</h2>
+        <h2 className="text-sm font-semibold text-blue-400">Upcoming Events</h2>
       </div>
       
       <div className="space-y-0">
         <CompactEvent
           title="Next Macro"
-          icon={<TrendingUp className="h-3 w-3 text-blue-500" />}
+          icon={<TrendingUp className="h-3 w-3 text-blue-400" />}
           event={nextMacro}
           nextEvent={nextMacroAfter}
           futureEvents={futureMacros}
@@ -230,7 +233,7 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
         
         <CompactEvent
           title="Next Killzone"
-          icon={<Zap className="h-3 w-3 text-purple-500" />}
+          icon={<Zap className="h-3 w-3 text-purple-400" />}
           event={nextKillzone}
           nextEvent={nextKillzoneAfter}
           futureEvents={futureKillzones}
@@ -240,7 +243,7 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
         
         <CompactEvent
           title="Next News Event"
-          icon={<Calendar className="h-3 w-3 text-orange-500" />}
+          icon={<Calendar className="h-3 w-3 text-orange-400" />}
           event={nextNewsEvent}
           nextEvent={nextNewsEventAfter}
           futureEvents={futureNewsEvents}

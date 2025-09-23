@@ -2,123 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Professional Trading Dashboard Design System */
 
 @layer base {
   :root {
-    /* Trading dashboard - dark professional theme */
-    --background: 217 19% 12%;
-    --foreground: 213 31% 91%;
+    /* Dark trading terminal theme */
+    --background: 220 23% 8%;
+    --foreground: 210 40% 95%;
 
-    --card: 217 19% 15%;
-    --card-foreground: 213 31% 91%;
+    --card: 220 23% 11%;
+    --card-foreground: 210 40% 95%;
 
-    --popover: 217 19% 15%;
-    --popover-foreground: 213 31% 91%;
+    --popover: 220 23% 11%;
+    --popover-foreground: 210 40% 95%;
 
-    --primary: 221 83% 53%;
-    --primary-foreground: 213 31% 91%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 40% 95%;
 
-    --secondary: 217 19% 18%;
-    --secondary-foreground: 213 31% 91%;
+    --secondary: 220 23% 14%;
+    --secondary-foreground: 210 40% 95%;
 
-    --muted: 217 19% 18%;
-    --muted-foreground: 217 10% 64%;
+    --muted: 220 23% 14%;
+    --muted-foreground: 220 14% 65%;
 
-    --accent: 221 83% 53%;
-    --accent-foreground: 213 31% 91%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 210 40% 95%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 213 31% 91%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 210 40% 95%;
 
-    --border: 217 19% 20%;
-    --input: 217 19% 18%;
-    --ring: 221 83% 53%;
+    --border: 220 23% 16%;
+    --input: 220 23% 14%;
+    --ring: 199 89% 48%;
 
-    /* Trading status colors */
-    --trading-green: 142 71% 45%;
-    --trading-green-foreground: 213 31% 91%;
-    --trading-amber: 38 92% 50%;
-    --trading-amber-foreground: 217 19% 12%;
-    --trading-red: 0 72% 51%;
-    --trading-red-foreground: 213 31% 91%;
+    /* Trading status colors - Financial market inspired */
+    --trading-bull: 142 76% 36%;          /* Strong green for bullish/active */
+    --trading-bull-light: 142 50% 45%;    /* Lighter green */
+    --trading-bear: 0 75% 55%;            /* Red for bearish/halt */
+    --trading-bear-light: 0 60% 60%;      /* Lighter red */
+    --trading-neutral: 45 96% 55%;        /* Amber for neutral/caution */
+    --trading-neutral-light: 45 85% 65%;  /* Lighter amber */
+    
+    /* Specific trading element colors */
+    --macro-color: 199 89% 48%;           /* Blue for macros */
+    --killzone-color: 270 95% 65%;        /* Purple for killzones */
+    --news-color: 30 96% 60%;             /* Orange for news */
+    --time-color: 199 89% 48%;            /* Blue for time displays */
+    
+    /* Chart and data colors */
+    --chart-grid: 220 23% 18%;
+    --chart-text: 220 14% 70%;
+    --data-positive: 142 76% 36%;
+    --data-negative: 0 75% 55%;
+    --data-neutral: 220 14% 65%;
 
-    /* Timeline colors */
-    --timeline-macro: 142 71% 45%;
-    --timeline-killzone: 159 64% 52%;
-    --timeline-premarket: 38 92% 50%;
-    --timeline-lunch: 0 72% 51%;
-    --timeline-inactive: 217 10% 40%;
+    /* Enhanced gradients for depth */
+    --gradient-card: linear-gradient(145deg, hsl(220 23% 12%), hsl(220 23% 10%));
+    --gradient-trading: linear-gradient(135deg, hsl(var(--trading-bull)), hsl(142 50% 45%));
+    --gradient-caution: linear-gradient(135deg, hsl(var(--trading-neutral)), hsl(45 85% 65%));
+    --gradient-halt: linear-gradient(135deg, hsl(var(--trading-bear)), hsl(0 60% 60%));
+    --gradient-macro: linear-gradient(135deg, hsl(var(--macro-color)), hsl(199 70% 55%));
+    --gradient-killzone: linear-gradient(135deg, hsl(var(--killzone-color)), hsl(270 75% 70%));
+    --gradient-news: linear-gradient(135deg, hsl(var(--news-color)), hsl(30 80% 65%));
 
-    /* Gradients */
-    --gradient-trading: linear-gradient(135deg, hsl(var(--trading-green)), hsl(159 64% 52%));
-    --gradient-caution: linear-gradient(135deg, hsl(var(--trading-amber)), hsl(45 93% 58%));
-    --gradient-halt: linear-gradient(135deg, hsl(var(--trading-red)), hsl(0 84% 60%));
-    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(217 19% 18%));
-
-    /* Shadows */
-    --shadow-trading: 0 4px 20px hsl(var(--trading-green) / 0.3);
-    --shadow-caution: 0 4px 20px hsl(var(--trading-amber) / 0.3);
-    --shadow-halt: 0 4px 20px hsl(var(--trading-red) / 0.3);
-    --shadow-card: 0 4px 20px hsl(217 19% 8% / 0.4);
+    /* Professional shadows with color tints */
+    --shadow-card: 0 8px 32px hsl(220 23% 4% / 0.6);
+    --shadow-trading: 0 4px 24px hsl(var(--trading-bull) / 0.25);
+    --shadow-caution: 0 4px 24px hsl(var(--trading-neutral) / 0.25);
+    --shadow-halt: 0 4px 24px hsl(var(--trading-bear) / 0.25);
+    --shadow-focus: 0 0 0 3px hsl(var(--ring) / 0.2);
 
     --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -129,5 +83,93 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(135deg, hsl(220 23% 8%), hsl(220 23% 6%));
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Trading Dashboard Specific Components */
+  .trading-card {
+    @apply bg-card border border-border rounded-lg shadow-lg;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .trading-status-active {
+    @apply bg-green-500/10 border-green-500/30 text-green-400;
+    box-shadow: 0 0 20px hsl(var(--trading-bull) / 0.3);
+  }
+
+  .trading-status-caution {
+    @apply bg-yellow-500/10 border-yellow-500/30 text-yellow-400;
+    box-shadow: 0 0 20px hsl(var(--trading-neutral) / 0.3);
+  }
+
+  .trading-status-halt {
+    @apply bg-red-500/10 border-red-500/30 text-red-400;
+    box-shadow: 0 0 20px hsl(var(--trading-bear) / 0.3);
+  }
+
+  .macro-accent {
+    @apply text-blue-400 bg-blue-500/10;
+  }
+
+  .killzone-accent {
+    @apply text-purple-400 bg-purple-500/10;
+  }
+
+  .news-accent {
+    @apply text-orange-400 bg-orange-500/10;
+  }
+
+  .countdown-urgent {
+    @apply text-red-400 font-bold;
+    text-shadow: 0 0 8px hsl(var(--trading-bear) / 0.6);
+  }
+
+  .countdown-soon {
+    @apply text-yellow-400 font-semibold;
+    text-shadow: 0 0 8px hsl(var(--trading-neutral) / 0.6);
+  }
+
+  .countdown-normal {
+    @apply text-blue-400;
+  }
+
+  /* Timeline specific styles */
+  .timeline-macro {
+    background: var(--gradient-macro);
+    box-shadow: 0 2px 8px hsl(var(--macro-color) / 0.3);
+  }
+
+  .timeline-killzone {
+    background: var(--gradient-killzone);
+    box-shadow: 0 2px 8px hsl(var(--killzone-color) / 0.3);
+  }
+
+  .timeline-news {
+    background: var(--gradient-news);
+    box-shadow: 0 2px 8px hsl(var(--news-color) / 0.3);
+  }
+
+  .timeline-inactive {
+    @apply bg-muted/50 text-muted-foreground;
+  }
+
+  /* Interactive elements */
+  .trading-button {
+    @apply transition-all duration-200 hover:scale-105 active:scale-95;
+  }
+
+  .trading-hover {
+    @apply transition-all duration-200 hover:bg-muted/30 hover:border-primary/30;
+  }
+
+  /* Glass effect for overlays */
+  .glass-effect {
+    backdrop-filter: blur(12px);
+    background: hsl(var(--card) / 0.8);
+    border: 1px solid hsl(var(--border) / 0.5);
   }
 }
