@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Timeline } from './Timeline';
 import { TrafficLight } from './TrafficLight';
 import { SettingsPanel } from './SettingsPanel';
 import { Button } from '@/components/ui/button';
 import { Settings, Clock } from 'lucide-react';
 import { useTradeTime } from '../hooks/useTradeTime';
-import { TradingParameters, defaultTradingParameters } from '../utils/tradingLogic';
+import { useTradingParameters } from '../hooks/useTradingParameters';
 
 export const TradeTimeTracker: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
-  const [parameters, setParameters] = useState<TradingParameters>(defaultTradingParameters);
+  const { parameters, updateParameters, resetParameters } = useTradingParameters();
   const { currentTime, tradingStatus, currentPeriod, nextEvent } = useTradeTime(parameters);
 
   return (
@@ -86,7 +86,8 @@ export const TradeTimeTracker: React.FC = () => {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         parameters={parameters}
-        onParametersChange={setParameters}
+        onParametersChange={updateParameters}
+        onResetParameters={resetParameters}
       />
     </div>
   );

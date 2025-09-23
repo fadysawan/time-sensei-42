@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Input } from '@/components/ui/input';
 import { Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,8 +20,6 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [tempHours, setTempHours] = useState(value.hours);
   const [tempMinutes, setTempMinutes] = useState(value.minutes);
-  const hoursRef = useRef<HTMLInputElement>(null);
-  const minutesRef = useRef<HTMLInputElement>(null);
 
   // Update temp values when value prop changes
   useEffect(() => {
@@ -32,20 +29,6 @@ export const TimePicker: React.FC<TimePickerProps> = ({
 
   const formatTime = (hours: number, minutes: number) => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  };
-
-  const handleHoursChange = (newHours: string) => {
-    const hours = parseInt(newHours) || 0;
-    if (hours >= 0 && hours <= 23) {
-      setTempHours(hours);
-    }
-  };
-
-  const handleMinutesChange = (newMinutes: string) => {
-    const minutes = parseInt(newMinutes) || 0;
-    if (minutes >= 0 && minutes <= 59) {
-      setTempMinutes(minutes);
-    }
   };
 
   const handleApply = () => {
@@ -92,75 +75,69 @@ export const TimePicker: React.FC<TimePickerProps> = ({
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal h-8",
+            "w-full justify-start text-left font-normal h-8 text-xs",
             !value && "text-muted-foreground",
             className
           )}
           disabled={disabled}
         >
-          <Clock className="mr-2 h-4 w-4" />
+          <Clock className="mr-1 h-3 w-3" />
           {formatTime(value.hours, value.minutes)}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-4" align="start">
-        <div className="space-y-4">
+      <PopoverContent className="w-72 p-3" align="start">
+        <div className="space-y-3">
           <div className="text-sm font-medium">Select Time</div>
           
           {/* Time Display and Controls */}
-          <div className="flex items-center justify-center space-x-2">
-            <div className="flex flex-col items-center">
+          <div className="flex items-center justify-center space-x-3">
+            <div className="flex flex-col items-center space-y-1">
+              <div className="text-xs text-muted-foreground">Hours</div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={incrementHours}
-                className="h-8 w-8 p-0"
+                className="h-7 w-8 p-0 text-xs"
               >
                 +
               </Button>
-              <Input
-                ref={hoursRef}
-                type="number"
-                min="0"
-                max="23"
-                value={tempHours.toString().padStart(2, '0')}
-                onChange={(e) => handleHoursChange(e.target.value)}
-                className="w-16 h-12 text-center text-lg font-mono"
-              />
+              <div className="w-12 h-12 border rounded-md flex items-center justify-center bg-background">
+                <span className="text-lg font-mono font-bold">
+                  {tempHours.toString().padStart(2, '0')}
+                </span>
+              </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={decrementHours}
-                className="h-8 w-8 p-0"
+                className="h-7 w-8 p-0 text-xs"
               >
                 -
               </Button>
             </div>
             
-            <div className="text-2xl font-bold">:</div>
+            <div className="text-2xl font-bold pt-6">:</div>
             
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center space-y-1">
+              <div className="text-xs text-muted-foreground">Minutes</div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={incrementMinutes}
-                className="h-8 w-8 p-0"
+                className="h-7 w-8 p-0 text-xs"
               >
                 +
               </Button>
-              <Input
-                ref={minutesRef}
-                type="number"
-                min="0"
-                max="59"
-                value={tempMinutes.toString().padStart(2, '0')}
-                onChange={(e) => handleMinutesChange(e.target.value)}
-                className="w-16 h-12 text-center text-lg font-mono"
-              />
+              <div className="w-12 h-12 border rounded-md flex items-center justify-center bg-background">
+                <span className="text-lg font-mono font-bold">
+                  {tempMinutes.toString().padStart(2, '0')}
+                </span>
+              </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={decrementMinutes}
-                className="h-8 w-8 p-0"
+                className="h-7 w-8 p-0 text-xs"
               >
                 -
               </Button>
@@ -170,7 +147,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
           {/* Quick Time Buttons */}
           <div>
             <div className="text-xs text-muted-foreground mb-2">Quick Times</div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-1">
               {quickTimes.map((time) => (
                 <Button
                   key={time.label}
@@ -180,7 +157,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                     setTempHours(time.hours);
                     setTempMinutes(time.minutes);
                   }}
-                  className="h-8 text-xs"
+                  className="h-7 text-xs px-2"
                 >
                   {time.label}
                 </Button>
@@ -190,10 +167,10 @@ export const TimePicker: React.FC<TimePickerProps> = ({
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-2 pt-2 border-t">
-            <Button variant="outline" size="sm" onClick={handleCancel}>
+            <Button variant="outline" size="sm" onClick={handleCancel} className="h-7 px-3 text-xs">
               Cancel
             </Button>
-            <Button size="sm" onClick={handleApply}>
+            <Button size="sm" onClick={handleApply} className="h-7 px-3 text-xs">
               Apply
             </Button>
           </div>

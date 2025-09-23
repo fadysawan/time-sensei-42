@@ -20,6 +20,7 @@ export interface MacroSession {
   name: string;
   start: TimeRange;
   end: TimeRange;
+  region: 'Tokyo' | 'London' | 'New York';
 }
 
 export interface NewsEvent {
@@ -27,6 +28,7 @@ export interface NewsEvent {
   time: TimeRange;
   name: string;
   impact: 'high' | 'medium' | 'low';
+  region: 'Tokyo' | 'London' | 'New York';
 }
 
 export interface TradingParameters {
@@ -48,49 +50,57 @@ export const defaultTradingParameters: TradingParameters = {
       id: 'london-1',
       name: 'London Session 1',
       start: { hours: 9, minutes: 33 },
-      end: { hours: 10, minutes: 0 }
+      end: { hours: 10, minutes: 0 },
+      region: 'London'
     },
     {
       id: 'london-2', 
       name: 'London Session 2',
       start: { hours: 11, minutes: 3 },
-      end: { hours: 11, minutes: 30 }
+      end: { hours: 11, minutes: 30 },
+      region: 'London'
     },
     {
       id: 'ny-am-1',
       name: 'NY AM 1',
       start: { hours: 15, minutes: 50 },
-      end: { hours: 16, minutes: 10 }
+      end: { hours: 16, minutes: 10 },
+      region: 'New York'
     },
     {
       id: 'ny-am-2',
       name: 'NY AM 2', 
       start: { hours: 16, minutes: 50 },
-      end: { hours: 17, minutes: 10 }
+      end: { hours: 17, minutes: 10 },
+      region: 'New York'
     },
     {
       id: 'ny-am-3',
       name: 'NY AM 3',
       start: { hours: 17, minutes: 50 },
-      end: { hours: 18, minutes: 10 }
+      end: { hours: 18, minutes: 10 },
+      region: 'New York'
     },
     {
       id: 'ny-midday',
       name: 'NY Midday',
       start: { hours: 18, minutes: 50 },
-      end: { hours: 19, minutes: 10 }
+      end: { hours: 19, minutes: 10 },
+      region: 'New York'
     },
     {
       id: 'ny-pm',
       name: 'NY PM',
       start: { hours: 20, minutes: 10 },
-      end: { hours: 20, minutes: 40 }
+      end: { hours: 20, minutes: 40 },
+      region: 'New York'
     },
     {
       id: 'ny-closing',
       name: 'NY Closing',
       start: { hours: 22, minutes: 15 },
-      end: { hours: 22, minutes: 45 }
+      end: { hours: 22, minutes: 45 },
+      region: 'New York'
     }
   ],
   killzones: {
@@ -118,13 +128,15 @@ export const defaultTradingParameters: TradingParameters = {
       id: 'fomc',
       time: { hours: 15, minutes: 30 },
       name: "FOMC Meeting",
-      impact: 'high'
+      impact: 'high',
+      region: 'New York'
     },
     {
       id: 'nfp',
       time: { hours: 12, minutes: 0 },
       name: "NFP Release", 
-      impact: 'high'
+      impact: 'high',
+      region: 'New York'
     }
   ]
 };
