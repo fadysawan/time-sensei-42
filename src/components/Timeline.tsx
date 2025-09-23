@@ -51,7 +51,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Trading Timeline</h2>
-        <div className="text-sm text-muted-foreground">Beirut Time (GMT+2)</div>
+        <div className="text-sm text-muted-foreground">Beirut Time (GMT+2/+3 with DST)</div>
       </div>
       
       {/* Timeline Container */}

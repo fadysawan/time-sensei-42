@@ -31,12 +31,17 @@ export interface NewsEvent {
   region: 'Tokyo' | 'London' | 'New York';
 }
 
+export interface KillzoneSession {
+  id: string;
+  name: string;
+  start: TimeRange;
+  end: TimeRange;
+  region: 'Tokyo' | 'London' | 'New York';
+}
+
 export interface TradingParameters {
   macros: MacroSession[];
-  killzones: {
-    london: { start: TimeRange; end: TimeRange };
-    newYork: { start: TimeRange; end: TimeRange };
-  };
+  killzones: KillzoneSession[];
   sessions: {
     premarket: { start: TimeRange; end: TimeRange };
     lunch: { start: TimeRange; end: TimeRange };
@@ -103,16 +108,22 @@ export const defaultTradingParameters: TradingParameters = {
       region: 'New York'
     }
   ],
-  killzones: {
-    london: { 
-      start: { hours: 6, minutes: 0 }, 
-      end: { hours: 9, minutes: 0 } 
+  killzones: [
+    {
+      id: 'london-kz',
+      name: 'London KZ',
+      start: { hours: 6, minutes: 0 },
+      end: { hours: 9, minutes: 0 },
+      region: 'London'
     },
-    newYork: { 
-      start: { hours: 14, minutes: 30 }, 
-      end: { hours: 17, minutes: 30 } 
+    {
+      id: 'newyork-kz',
+      name: 'New York KZ',
+      start: { hours: 14, minutes: 30 },
+      end: { hours: 17, minutes: 30 },
+      region: 'New York'
     }
-  },
+  ],
   sessions: {
     premarket: { 
       start: { hours: 7, minutes: 0 }, 
@@ -157,22 +168,15 @@ export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] =
   });
   
   // Add killzones
-  blocks.push({
-    type: 'killzone',
-    name: 'London KZ',
-    startHour: parameters.killzones.london.start.hours,
-    startMinute: parameters.killzones.london.start.minutes,
-    endHour: parameters.killzones.london.end.hours,
-    endMinute: parameters.killzones.london.end.minutes
-  });
-  
-  blocks.push({
-    type: 'killzone',
-    name: 'NY KZ',
-    startHour: parameters.killzones.newYork.start.hours,
-    startMinute: parameters.killzones.newYork.start.minutes,
-    endHour: parameters.killzones.newYork.end.hours,
-    endMinute: parameters.killzones.newYork.end.minutes
+  parameters.killzones.forEach(killzone => {
+    blocks.push({
+      type: 'killzone',
+      name: killzone.name,
+      startHour: killzone.start.hours,
+      startMinute: killzone.start.minutes,
+      endHour: killzone.end.hours,
+      endMinute: killzone.end.minutes
+    });
   });
   
   // Add sessions
@@ -304,4 +308,158 @@ const getNextEvent = (currentTime: number, blocks: TimeBlock[]): string => {
   } else {
     return `${nextBlock.name} in ${minutes}m`;
   }
+};
+
+export interface NextEvent {
+  name: string;
+  startTime: { hours: number; minutes: number };
+  timeUntilMinutes: number;
+  region?: string;
+  impact?: string;
+}
+
+export const getNextMacro = (currentHour: number, currentMinute: number, parameters: TradingParameters): NextEvent | null => {
+  const currentTime = currentHour * 60 + currentMinute;
+  
+  // Get upcoming macros today
+  const upcomingMacros = parameters.macros.filter(macro => {
+    const startTime = macro.start.hours * 60 + macro.start.minutes;
+    return startTime > currentTime;
+  });
+  
+  if (upcomingMacros.length > 0) {
+    // Sort by start time and get the earliest
+    const nextMacro = upcomingMacros.sort((a, b) => {
+      const aTime = a.start.hours * 60 + a.start.minutes;
+      const bTime = b.start.hours * 60 + b.start.minutes;
+      return aTime - bTime;
+    })[0];
+    
+    const startTime = nextMacro.start.hours * 60 + nextMacro.start.minutes;
+    return {
+      name: nextMacro.name,
+      startTime: nextMacro.start,
+      timeUntilMinutes: startTime - currentTime,
+      region: nextMacro.region
+    };
+  }
+  
+  // If no more macros today, get tomorrow's first macro
+  if (parameters.macros.length > 0) {
+    const firstMacro = parameters.macros.sort((a, b) => {
+      const aTime = a.start.hours * 60 + a.start.minutes;
+      const bTime = b.start.hours * 60 + b.start.minutes;
+      return aTime - bTime;
+    })[0];
+    
+    const startTime = firstMacro.start.hours * 60 + firstMacro.start.minutes;
+    const timeUntil = (24 * 60) - currentTime + startTime;
+    
+    return {
+      name: firstMacro.name,
+      startTime: firstMacro.start,
+      timeUntilMinutes: timeUntil,
+      region: firstMacro.region
+    };
+  }
+  
+  return null;
+};
+
+export const getNextKillzone = (currentHour: number, currentMinute: number, parameters: TradingParameters): NextEvent | null => {
+  const currentTime = currentHour * 60 + currentMinute;
+  
+  // Get upcoming killzones today
+  const upcomingKillzones = parameters.killzones.filter(killzone => {
+    const startTime = killzone.start.hours * 60 + killzone.start.minutes;
+    return startTime > currentTime;
+  });
+  
+  if (upcomingKillzones.length > 0) {
+    // Sort by start time and get the earliest
+    const nextKillzone = upcomingKillzones.sort((a, b) => {
+      const aTime = a.start.hours * 60 + a.start.minutes;
+      const bTime = b.start.hours * 60 + b.start.minutes;
+      return aTime - bTime;
+    })[0];
+    
+    const startTime = nextKillzone.start.hours * 60 + nextKillzone.start.minutes;
+    return {
+      name: nextKillzone.name,
+      startTime: nextKillzone.start,
+      timeUntilMinutes: startTime - currentTime,
+      region: nextKillzone.region
+    };
+  }
+  
+  // If no more killzones today, get tomorrow's first killzone
+  if (parameters.killzones.length > 0) {
+    const firstKillzone = parameters.killzones.sort((a, b) => {
+      const aTime = a.start.hours * 60 + a.start.minutes;
+      const bTime = b.start.hours * 60 + b.start.minutes;
+      return aTime - bTime;
+    })[0];
+    
+    const startTime = firstKillzone.start.hours * 60 + firstKillzone.start.minutes;
+    const timeUntil = (24 * 60) - currentTime + startTime;
+    
+    return {
+      name: firstKillzone.name,
+      startTime: firstKillzone.start,
+      timeUntilMinutes: timeUntil,
+      region: firstKillzone.region
+    };
+  }
+  
+  return null;
+};
+
+export const getNextNewsEvent = (currentHour: number, currentMinute: number, parameters: TradingParameters): NextEvent | null => {
+  const currentTime = currentHour * 60 + currentMinute;
+  
+  // Get upcoming news events today
+  const upcomingEvents = parameters.newsEvents.filter(event => {
+    const startTime = event.time.hours * 60 + event.time.minutes;
+    return startTime > currentTime;
+  });
+  
+  if (upcomingEvents.length > 0) {
+    // Sort by start time and get the earliest
+    const nextEvent = upcomingEvents.sort((a, b) => {
+      const aTime = a.time.hours * 60 + a.time.minutes;
+      const bTime = b.time.hours * 60 + b.time.minutes;
+      return aTime - bTime;
+    })[0];
+    
+    const startTime = nextEvent.time.hours * 60 + nextEvent.time.minutes;
+    return {
+      name: nextEvent.name,
+      startTime: nextEvent.time,
+      timeUntilMinutes: startTime - currentTime,
+      region: nextEvent.region,
+      impact: nextEvent.impact
+    };
+  }
+  
+  // If no more events today, get tomorrow's first event
+  if (parameters.newsEvents.length > 0) {
+    const firstEvent = parameters.newsEvents.sort((a, b) => {
+      const aTime = a.time.hours * 60 + a.time.minutes;
+      const bTime = b.time.hours * 60 + b.time.minutes;
+      return aTime - bTime;
+    })[0];
+    
+    const startTime = firstEvent.time.hours * 60 + firstEvent.time.minutes;
+    const timeUntil = (24 * 60) - currentTime + startTime;
+    
+    return {
+      name: firstEvent.name,
+      startTime: firstEvent.time,
+      timeUntilMinutes: timeUntil,
+      region: firstEvent.region,
+      impact: firstEvent.impact
+    };
+  }
+  
+  return null;
 };

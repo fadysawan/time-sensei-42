@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { TradingParameters, getTradingStatus, TradingStatus } from '../utils/tradingLogic';
-import { getBeirutTime } from '../utils/timeUtils';
+import { getBeirutTime, getNewYorkTime } from '../utils/timeUtils';
 
 interface UseTradeTimeReturn {
   currentTime: string;
+  newYorkTime: string;
   tradingStatus: TradingStatus;
   currentPeriod: string;
   nextEvent: string;
@@ -11,6 +12,7 @@ interface UseTradeTimeReturn {
 
 export const useTradeTime = (parameters: TradingParameters): UseTradeTimeReturn => {
   const [currentTime, setCurrentTime] = useState('');
+  const [newYorkTime, setNewYorkTime] = useState('');
   const [tradingStatus, setTradingStatus] = useState<TradingStatus>('red');
   const [currentPeriod, setCurrentPeriod] = useState('');
   const [nextEvent, setNextEvent] = useState('');
@@ -18,7 +20,10 @@ export const useTradeTime = (parameters: TradingParameters): UseTradeTimeReturn 
   useEffect(() => {
     const updateTime = () => {
       const beirutTime = getBeirutTime();
+      const nyTime = getNewYorkTime();
+      
       setCurrentTime(beirutTime.formatted);
+      setNewYorkTime(nyTime.formatted);
       
       const status = getTradingStatus(
         beirutTime.hours,
@@ -42,6 +47,7 @@ export const useTradeTime = (parameters: TradingParameters): UseTradeTimeReturn 
 
   return {
     currentTime,
+    newYorkTime,
     tradingStatus,
     currentPeriod,
     nextEvent

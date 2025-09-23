@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { TimePicker } from '@/components/ui/time-picker';
 import { Plus, Trash2, RotateCcw, X, ChevronDown, ChevronRight, Clock, Settings, Calendar, TrendingUp } from 'lucide-react';
-import { TradingParameters, MacroSession, NewsEvent } from '../utils/tradingLogic';
+import { TradingParameters, MacroSession, NewsEvent, KillzoneSession } from '../utils/tradingLogic';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -34,6 +34,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const [localParams, setLocalParams] = useState(parameters);
   const [expandedMacros, setExpandedMacros] = useState<Set<string>>(new Set());
   const [expandedEvents, setExpandedEvents] = useState<Set<string>>(new Set());
+  const [expandedKillzones, setExpandedKillzones] = useState<Set<string>>(new Set());
 
   // Sync localParams with parameters when the panel opens or parameters change
   React.useEffect(() => {
@@ -186,6 +187,18 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     });
   };
 
+  const toggleKillzoneExpanded = (killzoneId: string) => {
+    setExpandedKillzones(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(killzoneId)) {
+        newSet.delete(killzoneId);
+      } else {
+        newSet.add(killzoneId);
+      }
+      return newSet;
+    });
+  };
+
   const addMacro = () => {
     const newMacro: MacroSession = {
       id: `macro-${Date.now()}`,
@@ -212,10 +225,14 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       newSet.delete(macroToRemove.id);
       return newSet;
     });
-    setLocalParams(prev => ({
-      ...prev,
-      macros: prev.macros.filter((_, i) => i !== index)
-    }));
+    
+    const updatedParams = {
+      ...localParams,
+      macros: localParams.macros.filter((_, i) => i !== index)
+    };
+    
+    setLocalParams(updatedParams);
+    onParametersChange(updatedParams);
   };
 
   const handleNewsChange = (index: number, field: string, value: string | { hours: number; minutes: number }) => {
@@ -263,10 +280,93 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       newSet.delete(eventToRemove.id);
       return newSet;
     });
-    setLocalParams(prev => ({
-      ...prev,
-      newsEvents: prev.newsEvents.filter((_, i) => i !== index)
-    }));
+    
+    const updatedParams = {
+      ...localParams,
+      newsEvents: localParams.newsEvents.filter((_, i) => i !== index)
+    };
+    
+    setLocalParams(updatedParams);
+    onParametersChange(updatedParams);
+  };
+
+  const addKillzone = () => {
+    const newKillzone: KillzoneSession = {
+      id: `killzone-${Date.now()}`,
+      name: 'New Killzone',
+      start: { hours: 8, minutes: 0 },
+      end: { hours: 10, minutes: 0 },
+      region: 'London'
+    };
+    // Insert at beginning and sort by time
+    const newKillzones = [newKillzone, ...localParams.killzones];
+    const sortedKillzones = sortKillzonesByTime(newKillzones);
+    const updatedParams = { ...localParams, killzones: sortedKillzones };
+    setLocalParams(updatedParams);
+    onParametersChange(updatedParams);
+    // Expand the new killzone for immediate editing
+    setExpandedKillzones(prev => new Set([...prev, newKillzone.id]));
+  };
+
+  const removeKillzone = (index: number) => {
+    const killzoneToRemove = localParams.killzones[index];
+    // Remove from expanded set if it's expanded
+    setExpandedKillzones(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(killzoneToRemove.id);
+      return newSet;
+    });
+    const updatedParams = {
+      ...localParams,
+      killzones: localParams.killzones.filter((_, i) => i !== index)
+    };
+    setLocalParams(updatedParams);
+    onParametersChange(updatedParams);
+  };
+
+  const handleKillzoneChange = (index: number, field: string, value: string | { hours: number; minutes: number }) => {
+    const newKillzones = [...localParams.killzones];
+    
+    if (field === 'start' || field === 'end') {
+      const timeValue = value as { hours: number; minutes: number };
+      const oppositeField = field === 'start' ? 'end' : 'start';
+      const oppositeTime = newKillzones[index][oppositeField];
+      
+      if (field === 'start' && !validateTimePair(timeValue, oppositeTime)) {
+        alert('Start time must be earlier than end time');
+        return;
+      }
+      if (field === 'end' && !validateTimePair(oppositeTime, timeValue)) {
+        alert('End time must be later than start time');
+        return;
+      }
+      
+      newKillzones[index] = {
+        ...newKillzones[index],
+        [field]: timeValue
+      };
+    } else {
+      newKillzones[index] = {
+        ...newKillzones[index],
+        [field]: value
+      };
+    }
+    
+    // Sort killzones by time if time field changed
+    const finalKillzones = (field === 'start' || field === 'end') ? sortKillzonesByTime(newKillzones) : newKillzones;
+    const updatedParams = { ...localParams, killzones: finalKillzones };
+    setLocalParams(updatedParams);
+    // Auto-save all changes immediately
+    onParametersChange(updatedParams);
+  };
+
+  // Helper function to sort killzones by start time
+  const sortKillzonesByTime = (killzones: KillzoneSession[]) => {
+    return [...killzones].sort((a, b) => {
+      const aMinutes = timeToMinutes(a.start);
+      const bMinutes = timeToMinutes(b.start);
+      return aMinutes - bMinutes;
+    });
   };
 
   const handleSave = () => {
@@ -358,18 +458,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                               ) : (
                                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
                               )}
-                              <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeMacro(originalIndex);
-                                }}
-                                size="sm"
-                                variant="ghost"
-                                className="h-7 w-7 p-0 text-destructive hover:text-destructive"
-                                title="Remove macro"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
                             </div>
                           </div>
                         </CollapsibleTrigger>
@@ -416,6 +504,17 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                                 />
                               </div>
                             </div>
+                            <div className="flex justify-end pt-2">
+                              <Button
+                                onClick={() => removeMacro(originalIndex)}
+                                size="sm"
+                                variant="destructive"
+                                className="h-8"
+                              >
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Delete Macro
+                              </Button>
+                            </div>
                           </div>
                         </CollapsibleContent>
                       </div>
@@ -429,50 +528,103 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             {/* Killzones Tab */}
             <TabsContent value="killzones" className="flex-1 overflow-y-auto mt-0 px-4">
               <div className="bg-card rounded-lg p-3">
-                <div className="mb-3">
-                  <h3 className="text-base font-semibold">Killzones</h3>
-                  <p className="text-xs text-muted-foreground">Set your London and New York killzone times</p>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="text-base font-semibold">Killzones</h3>
+                    <p className="text-xs text-muted-foreground">Configure your killzone trading sessions</p>
+                  </div>
+                  <Button onClick={addKillzone} size="sm" variant="outline" className="h-8">
+                    <Plus className="w-3 h-3 mr-1" />
+                    Add Killzone
+                  </Button>
                 </div>
-                <div className="space-y-3">
-                  <div className="p-3 border rounded-md bg-background/30">
-                    <Label className="text-sm font-medium text-foreground mb-2 block">London Killzone</Label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-xs">Start</Label>
-                        <TimePicker
-                          value={localParams.killzones.london.start}
-                          onChange={(time) => handleTimeChange('killzones', 'london.start', time)}
-                        />
+                <div className="space-y-2">
+                  {sortKillzonesByTime(localParams.killzones).map((killzone, index) => {
+                    // Find the original index in the unsorted array for change handling
+                    const originalIndex = localParams.killzones.findIndex(k => k.id === killzone.id);
+                    const isExpanded = expandedKillzones.has(killzone.id);
+                    return (
+                    <Collapsible key={killzone.id} open={isExpanded} onOpenChange={() => toggleKillzoneExpanded(killzone.id)}>
+                      <div className="border rounded-md bg-background/50 hover:bg-background transition-colors">
+                        <CollapsibleTrigger className="w-full p-3 text-left">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="font-medium text-sm">{killzone.name}</div>
+                              <div className="text-xs text-muted-foreground mt-1 flex items-center space-x-2">
+                                <span>{formatTimeDisplay(killzone.start)} - {formatTimeDisplay(killzone.end)}</span>
+                                <span className="inline-block w-1 h-1 rounded-full bg-muted-foreground"></span>
+                                <span className="font-medium">{killzone.region}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              {isExpanded ? (
+                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </div>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="px-3 pb-3">
+                          <div className="space-y-3 border-t pt-3 mt-3">
+                            <div>
+                              <Label className="text-xs">Killzone Name</Label>
+                              <Input
+                                value={killzone.name}
+                                onChange={(e) => handleKillzoneChange(originalIndex, 'name', e.target.value)}
+                                className="h-8"
+                                placeholder="Killzone name"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Session Region</Label>
+                              <Select
+                                value={killzone.region}
+                                onValueChange={(value) => handleKillzoneChange(originalIndex, 'region', value)}
+                              >
+                                <SelectTrigger className="h-8">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Tokyo">Tokyo</SelectItem>
+                                  <SelectItem value="London">London</SelectItem>
+                                  <SelectItem value="New York">New York</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <Label className="text-xs">Start Time</Label>
+                                <TimePicker
+                                  value={killzone.start}
+                                  onChange={(time) => handleKillzoneChange(originalIndex, 'start', time)}
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs">End Time</Label>
+                                <TimePicker
+                                  value={killzone.end}
+                                  onChange={(time) => handleKillzoneChange(originalIndex, 'end', time)}
+                                />
+                              </div>
+                            </div>
+                            <div className="flex justify-end pt-2">
+                              <Button
+                                onClick={() => removeKillzone(originalIndex)}
+                                size="sm"
+                                variant="destructive"
+                                className="h-8"
+                              >
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Delete Killzone
+                              </Button>
+                            </div>
+                          </div>
+                        </CollapsibleContent>
                       </div>
-                      <div>
-                        <Label className="text-xs">End</Label>
-                        <TimePicker
-                          value={localParams.killzones.london.end}
-                          onChange={(time) => handleTimeChange('killzones', 'london.end', time)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="p-3 border rounded-md bg-background/30">
-                    <Label className="text-sm font-medium text-foreground mb-2 block">New York Killzone</Label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-xs">Start</Label>
-                        <TimePicker
-                          value={localParams.killzones.newYork.start}
-                          onChange={(time) => handleTimeChange('killzones', 'newYork.start', time)}
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">End</Label>
-                        <TimePicker
-                          value={localParams.killzones.newYork.end}
-                          onChange={(time) => handleTimeChange('killzones', 'newYork.end', time)}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                    </Collapsible>
+                    );
+                  })}
                 </div>
               </div>
             </TabsContent>
@@ -570,18 +722,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                               ) : (
                                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
                               )}
-                              <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeNewsEvent(originalIndex);
-                                }}
-                                size="sm"
-                                variant="ghost"
-                                className="h-7 w-7 p-0 text-destructive hover:text-destructive"
-                                title="Remove event"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
                             </div>
                           </div>
                         </CollapsibleTrigger>
@@ -636,6 +776,17 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                                   </SelectContent>
                                 </Select>
                               </div>
+                            </div>
+                            <div className="flex justify-end pt-2">
+                              <Button
+                                onClick={() => removeNewsEvent(originalIndex)}
+                                size="sm"
+                                variant="destructive"
+                                className="h-8"
+                              >
+                                <Trash2 className="w-3 h-3 mr-1" />
+                                Delete Event
+                              </Button>
                             </div>
                           </div>
                         </CollapsibleContent>
