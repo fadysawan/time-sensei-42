@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { TimePicker } from '@/components/ui/time-picker';
 import { Plus, Trash2 } from 'lucide-react';
 import { TradingParameters, MacroSession, NewsEvent } from '../utils/tradingLogic';
 
@@ -32,11 +33,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   const handleTimeChange = (
     section: keyof TradingParameters,
     field: string,
-    value: string
+    time: { hours: number; minutes: number }
   ) => {
-    const [hours, minutes] = value.split(':').map(Number);
-    if (isNaN(hours) || isNaN(minutes)) return;
-    
     // Handle nested field paths like "london.start" or "newYork.end"
     if (field.includes('.')) {
       const [subSection, timeField] = field.split('.');
@@ -45,8 +43,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
         [section]: {
           ...prev[section],
           [subSection]: {
-            ...prev[section][subSection as keyof typeof prev[section]],
-            [timeField]: { hours, minutes }
+            ...(prev[section] as any)[subSection],
+            [timeField]: time
           }
         }
       }));
@@ -56,24 +54,21 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
         ...prev,
         [section]: {
           ...prev[section],
-          [field]: { hours, minutes }
+          [field]: time
         }
       }));
     }
   };
 
-  const handleMacroChange = (index: number, field: string, value: string) => {
+  const handleMacroChange = (index: number, field: string, value: string | { hours: number; minutes: number }) => {
     const newMacros = [...localParams.macros];
     if (field === 'name') {
-      newMacros[index] = { ...newMacros[index], [field]: value };
+      newMacros[index] = { ...newMacros[index], [field]: value as string };
     } else if (field === 'start' || field === 'end') {
-      const [hours, minutes] = value.split(':').map(Number);
-      if (!isNaN(hours) && !isNaN(minutes)) {
-        newMacros[index] = {
-          ...newMacros[index],
-          [field]: { hours, minutes }
-        };
-      }
+      newMacros[index] = {
+        ...newMacros[index],
+        [field]: value as { hours: number; minutes: number }
+      };
     }
     setLocalParams(prev => ({ ...prev, macros: newMacros }));
   };
@@ -98,18 +93,15 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     }));
   };
 
-  const handleNewsChange = (index: number, field: string, value: string) => {
+  const handleNewsChange = (index: number, field: string, value: string | { hours: number; minutes: number }) => {
     const newEvents = [...localParams.newsEvents];
     if (field === 'name' || field === 'impact') {
-      newEvents[index] = { ...newEvents[index], [field]: value };
+      newEvents[index] = { ...newEvents[index], [field]: value as string };
     } else if (field === 'time') {
-      const [hours, minutes] = value.split(':').map(Number);
-      if (!isNaN(hours) && !isNaN(minutes)) {
-        newEvents[index] = {
-          ...newEvents[index],
-          time: { hours, minutes }
-        };
-      }
+      newEvents[index] = {
+        ...newEvents[index],
+        time: value as { hours: number; minutes: number }
+      };
     }
     setLocalParams(prev => ({ ...prev, newsEvents: newEvents }));
   };
@@ -182,20 +174,16 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   </div>
                   <div>
                     <Label className="text-xs">Start</Label>
-                    <Input
-                      type="time"
-                      value={formatTimeInput(macro.start)}
-                      onChange={(e) => handleMacroChange(index, 'start', e.target.value)}
-                      className="h-8"
+                    <TimePicker
+                      value={macro.start}
+                      onChange={(time) => handleMacroChange(index, 'start', time)}
                     />
                   </div>
                   <div>
                     <Label className="text-xs">End</Label>
-                    <Input
-                      type="time"
-                      value={formatTimeInput(macro.end)}
-                      onChange={(e) => handleMacroChange(index, 'end', e.target.value)}
-                      className="h-8"
+                    <TimePicker
+                      value={macro.end}
+                      onChange={(time) => handleMacroChange(index, 'end', time)}
                     />
                   </div>
                   <div className="col-span-2 flex items-end">
@@ -222,19 +210,15 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <div className="grid grid-cols-3 gap-2">
                 <Label className="text-xs text-muted-foreground">London</Label>
                 <div>
-                  <Input
-                    type="time"
-                    value={formatTimeInput(localParams.killzones.london.start)}
-                    onChange={(e) => handleTimeChange('killzones', 'london.start', e.target.value)}
-                    className="h-8"
+                  <TimePicker
+                    value={localParams.killzones.london.start}
+                    onChange={(time) => handleTimeChange('killzones', 'london.start', time)}
                   />
                 </div>
                 <div>
-                  <Input
-                    type="time"
-                    value={formatTimeInput(localParams.killzones.london.end)}
-                    onChange={(e) => handleTimeChange('killzones', 'london.end', e.target.value)}
-                    className="h-8"
+                  <TimePicker
+                    value={localParams.killzones.london.end}
+                    onChange={(time) => handleTimeChange('killzones', 'london.end', time)}
                   />
                 </div>
               </div>
@@ -242,19 +226,15 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <div className="grid grid-cols-3 gap-2">
                 <Label className="text-xs text-muted-foreground">New York</Label>
                 <div>
-                  <Input
-                    type="time"
-                    value={formatTimeInput(localParams.killzones.newYork.start)}
-                    onChange={(e) => handleTimeChange('killzones', 'newYork.start', e.target.value)}
-                    className="h-8"
+                  <TimePicker
+                    value={localParams.killzones.newYork.start}
+                    onChange={(time) => handleTimeChange('killzones', 'newYork.start', time)}
                   />
                 </div>
                 <div>
-                  <Input
-                    type="time"
-                    value={formatTimeInput(localParams.killzones.newYork.end)}
-                    onChange={(e) => handleTimeChange('killzones', 'newYork.end', e.target.value)}
-                    className="h-8"
+                  <TimePicker
+                    value={localParams.killzones.newYork.end}
+                    onChange={(time) => handleTimeChange('killzones', 'newYork.end', time)}
                   />
                 </div>
               </div>
@@ -270,19 +250,15 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <div className="grid grid-cols-3 gap-2">
                 <Label className="text-xs text-muted-foreground">Pre-Market</Label>
                 <div>
-                  <Input
-                    type="time"
-                    value={formatTimeInput(localParams.sessions.premarket.start)}
-                    onChange={(e) => handleTimeChange('sessions', 'premarket.start', e.target.value)}
-                    className="h-8"
+                  <TimePicker
+                    value={localParams.sessions.premarket.start}
+                    onChange={(time) => handleTimeChange('sessions', 'premarket.start', time)}
                   />
                 </div>
                 <div>
-                  <Input
-                    type="time"
-                    value={formatTimeInput(localParams.sessions.premarket.end)}
-                    onChange={(e) => handleTimeChange('sessions', 'premarket.end', e.target.value)}
-                    className="h-8"
+                  <TimePicker
+                    value={localParams.sessions.premarket.end}
+                    onChange={(time) => handleTimeChange('sessions', 'premarket.end', time)}
                   />
                 </div>
               </div>
@@ -290,19 +266,15 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <div className="grid grid-cols-3 gap-2">
                 <Label className="text-xs text-muted-foreground">Lunch</Label>
                 <div>
-                  <Input
-                    type="time"
-                    value={formatTimeInput(localParams.sessions.lunch.start)}
-                    onChange={(e) => handleTimeChange('sessions', 'lunch.start', e.target.value)}
-                    className="h-8"
+                  <TimePicker
+                    value={localParams.sessions.lunch.start}
+                    onChange={(time) => handleTimeChange('sessions', 'lunch.start', time)}
                   />
                 </div>
                 <div>
-                  <Input
-                    type="time"
-                    value={formatTimeInput(localParams.sessions.lunch.end)}
-                    onChange={(e) => handleTimeChange('sessions', 'lunch.end', e.target.value)}
-                    className="h-8"
+                  <TimePicker
+                    value={localParams.sessions.lunch.end}
+                    onChange={(time) => handleTimeChange('sessions', 'lunch.end', time)}
                   />
                 </div>
               </div>
@@ -334,11 +306,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   </div>
                   <div>
                     <Label className="text-xs">Time</Label>
-                    <Input
-                      type="time"
-                      value={formatTimeInput(event.time)}
-                      onChange={(e) => handleNewsChange(index, 'time', e.target.value)}
-                      className="h-8"
+                    <TimePicker
+                      value={event.time}
+                      onChange={(time) => handleNewsChange(index, 'time', time)}
                     />
                   </div>
                   <div>
