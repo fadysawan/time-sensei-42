@@ -12,6 +12,7 @@ import { Plus, Trash2, RotateCcw, Clock, TrendingUp, Zap, Newspaper, Save, Chevr
 import { TradingParameters, MacroSession, KillzoneSession, TimeRange } from '../utils/tradingLogic';
 import { NewsTemplate, NewsInstance } from '../models';
 import { NewsSettings } from './settings/NewsSettings';
+import { MarketSessionsManager } from './market/MarketSessionsManager';
 
 interface ExtendedTradingParameters extends TradingParameters {
   newsTemplates: NewsTemplate[];
@@ -32,6 +33,18 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
   // Use parameters directly for real-time updates - no local state
   const [expandedMacros, setExpandedMacros] = useState<Set<string>>(new Set());
   const [expandedKillzones, setExpandedKillzones] = useState<Set<string>>(new Set());
+  
+  // Add macro form state
+  const [newMacroName, setNewMacroName] = useState('');
+  const [newMacroStart, setNewMacroStart] = useState<TimeRange>({ hours: 9, minutes: 0 });
+  const [newMacroEnd, setNewMacroEnd] = useState<TimeRange>({ hours: 10, minutes: 0 });
+  const [newMacroRegion, setNewMacroRegion] = useState<'Tokyo' | 'London' | 'New York'>('London');
+  
+  // Add killzone form state
+  const [newKillzoneName, setNewKillzoneName] = useState('');
+  const [newKillzoneStart, setNewKillzoneStart] = useState<TimeRange>({ hours: 14, minutes: 0 });
+  const [newKillzoneEnd, setNewKillzoneEnd] = useState<TimeRange>({ hours: 16, minutes: 0 });
+  const [newKillzoneRegion, setNewKillzoneRegion] = useState<'Tokyo' | 'London' | 'New York'>('New York');
 
   const handleReset = () => {
     onResetParameters();
@@ -62,12 +75,14 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
 
   // Macro management functions with real-time updates
   const addMacro = () => {
+    if (!newMacroName.trim()) return;
+
     const newMacro: MacroSession = {
       id: `macro-${Date.now()}`,
-      name: 'New Macro Event',
-      start: { hours: 9, minutes: 0 },
-      end: { hours: 10, minutes: 0 },
-      region: 'London'
+      name: newMacroName.trim(),
+      start: { ...newMacroStart },
+      end: { ...newMacroEnd },
+      region: newMacroRegion
     };
     
     const updatedParams = {
@@ -77,6 +92,12 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
     onParametersChange(updatedParams);
     // Auto-expand the new macro
     setExpandedMacros(prev => new Set(prev).add(newMacro.id));
+    
+    // Reset form
+    setNewMacroName('');
+    setNewMacroStart({ hours: 9, minutes: 0 });
+    setNewMacroEnd({ hours: 10, minutes: 0 });
+    setNewMacroRegion('London');
   };
 
   const removeMacro = (index: number) => {
@@ -87,25 +108,38 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
     onParametersChange(updatedParams);
   };
 
-  const updateMacro = (index: number, field: keyof MacroSession, value: any) => {
+  const updateMacro = (macroId: string, field: keyof MacroSession, value: any) => {
+    console.log('🔧 Updating macro:', { macroId, field, value, currentMacros: parameters.macros });
     const newMacros = [...parameters.macros];
+    const index = newMacros.findIndex(m => m.id === macroId);
+    
+    if (index === -1) {
+      console.error('❌ Macro not found with ID:', macroId);
+      return;
+    }
+    
+    console.log('📍 Found macro at index:', index, 'Old value:', newMacros[index][field]);
     newMacros[index] = { ...newMacros[index], [field]: value };
+    console.log('📝 Updated macro:', newMacros[index]);
     
     const updatedParams = {
       ...parameters,
       macros: newMacros
     };
+    console.log('📤 Sending updated params:', updatedParams);
     onParametersChange(updatedParams);
   };
 
   // Killzone management functions with real-time updates
   const addKillzone = () => {
+    if (!newKillzoneName.trim()) return;
+
     const newKillzone: KillzoneSession = {
       id: `killzone-${Date.now()}`,
-      name: 'New Killzone',
-      start: { hours: 14, minutes: 0 },
-      end: { hours: 16, minutes: 0 },
-      region: 'New York'
+      name: newKillzoneName.trim(),
+      start: { ...newKillzoneStart },
+      end: { ...newKillzoneEnd },
+      region: newKillzoneRegion
     };
     
     const updatedParams = {
@@ -115,6 +149,12 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
     onParametersChange(updatedParams);
     // Auto-expand the new killzone
     setExpandedKillzones(prev => new Set(prev).add(newKillzone.id));
+    
+    // Reset form
+    setNewKillzoneName('');
+    setNewKillzoneStart({ hours: 14, minutes: 0 });
+    setNewKillzoneEnd({ hours: 16, minutes: 0 });
+    setNewKillzoneRegion('New York');
   };
 
   const removeKillzone = (index: number) => {
@@ -138,20 +178,7 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
 
 
 
-  // Market sessions management with real-time updates
-  const updateSession = (sessionType: 'premarket' | 'lunch', timeType: 'start' | 'end', time: TimeRange) => {
-    const updatedParams = {
-      ...parameters,
-      sessions: {
-        ...parameters.sessions,
-        [sessionType]: {
-          ...parameters.sessions[sessionType],
-          [timeType]: time
-        }
-      }
-    };
-    onParametersChange(updatedParams);
-  };
+
 
   return (
     <div className="space-y-6">
@@ -175,35 +202,25 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
           </TabsTrigger>
         </TabsList>
 
-        {/* Market Hours Tab */}
+        {/* Market Sessions Tab */}
         <TabsContent value="market" className="space-y-4 mt-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-blue-400">Market Sessions</CardTitle>
-              <CardDescription>Configure pre-market and lunch break timings</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-cyan-400">Market Sessions</CardTitle>
+                <CardDescription>Configure trading session periods and market hours</CardDescription>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Pre-market Session */}
-              <div className="space-y-4">
-                <TimeIntervalPicker
-                  label="Pre-Market Session"
-                  startTime={parameters.sessions.premarket.start}
-                  endTime={parameters.sessions.premarket.end}
-                  onStartTimeChange={(time) => updateSession('premarket', 'start', time)}
-                  onEndTimeChange={(time) => updateSession('premarket', 'end', time)}
-                />
-              </div>
-
-              {/* Lunch Break */}
-              <div className="space-y-4">
-                <TimeIntervalPicker
-                  label="Lunch Break"
-                  startTime={parameters.sessions.lunch.start}
-                  endTime={parameters.sessions.lunch.end}
-                  onStartTimeChange={(time) => updateSession('lunch', 'start', time)}
-                  onEndTimeChange={(time) => updateSession('lunch', 'end', time)}
-                />
-              </div>
+            <CardContent>
+              <MarketSessionsManager
+                marketSessions={parameters.marketSessions || []}
+                onSessionsChange={(sessions) => 
+                  onParametersChange({
+                    ...parameters,
+                    marketSessions: sessions
+                  })
+                }
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -211,19 +228,71 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
         {/* Macro Events Tab */}
         <TabsContent value="macros" className="space-y-4 mt-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader>
               <div>
                 <CardTitle className="text-blue-400">Macro Events</CardTitle>
                 <CardDescription>High-impact economic events and sessions</CardDescription>
               </div>
-              <Button onClick={addMacro} size="sm" className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Macro
-              </Button>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {parameters.macros.map((macro, index) => (
+              <div className="space-y-6">
+                {/* Add New Macro Panel */}
+                <div className="border rounded-lg p-4 bg-muted/30">
+                  <div className="text-sm font-medium text-blue-400 flex items-center space-x-2 mb-4">
+                    <Plus className="h-4 w-4" />
+                    <span>Add New Macro Event</span>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="macro-name">Macro Name</Label>
+                        <Input
+                          id="macro-name"
+                          placeholder="e.g., London Session 1"
+                          value={newMacroName}
+                          onChange={(e) => setNewMacroName(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="macro-region">Region</Label>
+                        <Select value={newMacroRegion} onValueChange={(value: 'Tokyo' | 'London' | 'New York') => setNewMacroRegion(value)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Tokyo">Tokyo</SelectItem>
+                            <SelectItem value="London">London</SelectItem>
+                            <SelectItem value="New York">New York</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Macro Time Range</Label>
+                      <TimeIntervalPicker
+                        label=""
+                        startTime={newMacroStart}
+                        endTime={newMacroEnd}
+                        onStartTimeChange={setNewMacroStart}
+                        onEndTimeChange={setNewMacroEnd}
+                      />
+                    </div>
+
+                    <Button 
+                      onClick={addMacro}
+                      disabled={!newMacroName.trim()}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Macro Event
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Existing Macros */}
+                <div className="space-y-4">
+                  {parameters.macros.map((macro, index) => (
                   <Collapsible
                     key={macro.id}
                     open={expandedMacros.has(macro.id)}
@@ -250,7 +319,7 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
                         <div className="flex items-center justify-between">
                           <Input
                             value={macro.name}
-                            onChange={(e) => updateMacro(index, 'name', e.target.value)}
+                            onChange={(e) => updateMacro(macro.id, 'name', e.target.value)}
                             className="flex-1 mr-4"
                             placeholder="Macro event name"
                           />
@@ -269,13 +338,19 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
                               label="Macro Time Range"
                               startTime={macro.start}
                               endTime={macro.end}
-                              onStartTimeChange={(time) => updateMacro(index, 'start', time)}
-                              onEndTimeChange={(time) => updateMacro(index, 'end', time)}
+                              onStartTimeChange={(time) => {
+                                console.log('🕐 TimeIntervalPicker start time changed:', time, 'for macro:', macro.id);
+                                updateMacro(macro.id, 'start', time);
+                              }}
+                              onEndTimeChange={(time) => {
+                                console.log('🕐 TimeIntervalPicker end time changed:', time, 'for macro:', macro.id);
+                                updateMacro(macro.id, 'end', time);
+                              }}
                             />
                           </div>
                           <div className="space-y-2">
                             <Label>Region</Label>
-                            <Select value={macro.region} onValueChange={(value) => updateMacro(index, 'region', value)}>
+                            <Select value={macro.region} onValueChange={(value) => updateMacro(macro.id, 'region', value)}>
                               <SelectTrigger>
                                 <SelectValue />
                               </SelectTrigger>
@@ -292,12 +367,13 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
                   </Collapsible>
                 ))}
                 
-                {parameters.macros.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No macro events configured</p>
-                  </div>
-                )}
+                  {parameters.macros.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No macro events configured</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -306,19 +382,71 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
         {/* Killzones Tab */}
         <TabsContent value="killzones" className="space-y-4 mt-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader>
               <div>
                 <CardTitle className="text-purple-400">Killzones</CardTitle>
                 <CardDescription>High-volatility trading periods</CardDescription>
               </div>
-              <Button onClick={addKillzone} size="sm" className="bg-purple-600 hover:bg-purple-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Killzone
-              </Button>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {parameters.killzones.map((killzone, index) => (
+              <div className="space-y-6">
+                {/* Add New Killzone Panel */}
+                <div className="border rounded-lg p-4 bg-muted/30">
+                  <div className="text-sm font-medium text-purple-400 flex items-center space-x-2 mb-4">
+                    <Plus className="h-4 w-4" />
+                    <span>Add New Killzone</span>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="killzone-name">Killzone Name</Label>
+                        <Input
+                          id="killzone-name"
+                          placeholder="e.g., London Killzone"
+                          value={newKillzoneName}
+                          onChange={(e) => setNewKillzoneName(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="killzone-region">Region</Label>
+                        <Select value={newKillzoneRegion} onValueChange={(value: 'Tokyo' | 'London' | 'New York') => setNewKillzoneRegion(value)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Tokyo">Tokyo</SelectItem>
+                            <SelectItem value="London">London</SelectItem>
+                            <SelectItem value="New York">New York</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Killzone Time Range</Label>
+                      <TimeIntervalPicker
+                        label=""
+                        startTime={newKillzoneStart}
+                        endTime={newKillzoneEnd}
+                        onStartTimeChange={setNewKillzoneStart}
+                        onEndTimeChange={setNewKillzoneEnd}
+                      />
+                    </div>
+
+                    <Button 
+                      onClick={addKillzone}
+                      disabled={!newKillzoneName.trim()}
+                      className="w-full bg-purple-600 hover:bg-purple-700"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Killzone
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Existing Killzones */}
+                <div className="space-y-4">
+                  {parameters.killzones.map((killzone, index) => (
                   <Collapsible
                     key={killzone.id}
                     open={expandedKillzones.has(killzone.id)}
@@ -387,12 +515,13 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
                   </Collapsible>
                 ))}
                 
-                {parameters.killzones.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Zap className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No killzones configured</p>
-                  </div>
-                )}
+                  {parameters.killzones.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Zap className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>No killzones configured</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -401,9 +530,11 @@ export const SettingsPageContent: React.FC<SettingsPageContentProps> = ({
         {/* News Events Tab - New System */}
         <TabsContent value="news" className="space-y-4 mt-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-orange-400">News Management</CardTitle>
-              <CardDescription>Manage news templates and create scheduled instances with countdown/cooldown periods</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-orange-400">News Management</CardTitle>
+                <CardDescription>Manage news templates and create scheduled instances with countdown/cooldown periods</CardDescription>
+              </div>
             </CardHeader>
             <CardContent>
               <NewsSettings

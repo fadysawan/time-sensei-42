@@ -9,7 +9,7 @@ export interface TimeRange {
 }
 
 export interface TimeBlock {
-  type: 'macro' | 'killzone' | 'premarket' | 'lunch' | 'news' | 'inactive';
+  type: 'macro' | 'killzone' | 'premarket' | 'market-open' | 'lunch' | 'after-hours' | 'custom' | 'news' | 'inactive';
   name: string;
   startHour: number;
   startMinute: number;
@@ -33,13 +33,19 @@ export interface KillzoneSession {
   region: 'Tokyo' | 'London' | 'New York';
 }
 
+export interface MarketSession {
+  id: string;
+  name: string;
+  start: TimeRange;
+  end: TimeRange;
+  type: 'premarket' | 'market-open' | 'lunch' | 'after-hours' | 'custom';
+  isActive: boolean;
+}
+
 export interface TradingParameters {
   macros: MacroSession[];
   killzones: KillzoneSession[];
-  sessions: {
-    premarket: { start: TimeRange; end: TimeRange };
-    lunch: { start: TimeRange; end: TimeRange };
-  };
+  marketSessions: MarketSession[];
   newsTemplates: NewsTemplate[];
   newsInstances: NewsInstance[];
 }
@@ -119,16 +125,24 @@ export const defaultTradingParameters: TradingParameters = {
       region: 'New York'
     }
   ],
-  sessions: {
-    premarket: { 
-      start: { hours: 7, minutes: 0 }, 
-      end: { hours: 9, minutes: 30 } 
+  marketSessions: [
+    {
+      id: 'premarket',
+      name: 'Pre-Market',
+      start: { hours: 7, minutes: 0 },
+      end: { hours: 9, minutes: 30 },
+      type: 'premarket',
+      isActive: true
     },
-    lunch: { 
-      start: { hours: 18, minutes: 0 }, 
-      end: { hours: 19, minutes: 0 } 
+    {
+      id: 'lunch',
+      name: 'Lunch Break',
+      start: { hours: 19, minutes: 0 },
+      end: { hours: 20, minutes: 0 },
+      type: 'lunch',
+      isActive: true
     }
-  },
+  ],
   newsTemplates: NewsService.getDefaultNewsTemplates(),
   newsInstances: []
 };
@@ -160,24 +174,19 @@ export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] =
     });
   });
   
-  // Add sessions
-  blocks.push({
-    type: 'premarket',
-    name: 'Pre-Market',
-    startHour: parameters.sessions.premarket.start.hours,
-    startMinute: parameters.sessions.premarket.start.minutes,
-    endHour: parameters.sessions.premarket.end.hours,
-    endMinute: parameters.sessions.premarket.end.minutes
-  });
-  
-  blocks.push({
-    type: 'lunch',
-    name: 'Lunch',
-    startHour: parameters.sessions.lunch.start.hours,
-    startMinute: parameters.sessions.lunch.start.minutes,
-    endHour: parameters.sessions.lunch.end.hours,
-    endMinute: parameters.sessions.lunch.end.minutes
-  });
+  // Add active market sessions
+  parameters.marketSessions
+    .filter(session => session.isActive)
+    .forEach(session => {
+      blocks.push({
+        type: session.type,
+        name: session.name,
+        startHour: session.start.hours,
+        startMinute: session.start.minutes,
+        endHour: session.end.hours,
+        endMinute: session.end.minutes
+      });
+    });
   
   // Add active news instances
   const now = new Date();

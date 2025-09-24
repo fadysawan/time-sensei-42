@@ -56,8 +56,25 @@ export const TimeIntervalPicker: React.FC<TimeIntervalPickerProps> = ({
       return;
     }
 
-    onStartTimeChange(tempStartTime);
-    onEndTimeChange(tempEndTime);
+    console.log('🔄 TimeIntervalPicker handleApply called');
+    console.log('📅 Original values - Start:', startTime, 'End:', endTime);
+    console.log('📅 New values - Start:', tempStartTime, 'End:', tempEndTime);
+    
+    // Only call callbacks if values actually changed
+    const startChanged = JSON.stringify(tempStartTime) !== JSON.stringify(startTime);
+    const endChanged = JSON.stringify(tempEndTime) !== JSON.stringify(endTime);
+    
+    console.log('📊 Changes detected - Start:', startChanged, 'End:', endChanged);
+    
+    if (startChanged) {
+      console.log('📤 Calling onStartTimeChange with:', tempStartTime);
+      onStartTimeChange(tempStartTime);
+    }
+    if (endChanged) {
+      console.log('📤 Calling onEndTimeChange with:', tempEndTime);
+      onEndTimeChange(tempEndTime);
+    }
+    
     setIsOpen(false);
   };
 

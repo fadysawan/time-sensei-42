@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Settings, Clock, TrendingUp, AlertTriangle, Timer, Zap, Calendar, Target, Newspaper, Activity, Globe, DollarSign } from 'lucide-react';
 import { useTradeTime } from '../hooks/useTradeTime';
 import { useTradingParameters } from '../hooks/useTradingParameters';
+import { useStatusNotifications } from '../hooks/useStatusNotifications';
 import { formatCountdownSeconds, getEventTypeStyles, getStatusStyles } from '../utils/timeUtils';
 
 export const TradeTimeTracker: React.FC = () => {
@@ -22,6 +23,9 @@ export const TradeTimeTracker: React.FC = () => {
     upcomingEvents, 
     countdown 
   } = useTradeTime(parameters);
+
+  // Initialize status notifications hook
+  const { playNotificationSound } = useStatusNotifications(tradingStatus, currentPeriod);
 
   const countdownInfo = formatCountdownSeconds(countdown);
   const statusStyles = getStatusStyles(tradingStatus);
