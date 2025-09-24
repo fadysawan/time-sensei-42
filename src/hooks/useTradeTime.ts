@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TradingParameters, getTradingStatus, TradingStatus, generateTimeBlocks, TimeBlock } from '../utils/tradingLogic';
 import { getBeirutTime, getNewYorkTime } from '../utils/timeUtils';
+import { NewsTemplate, NewsInstance } from '../models';
 
 interface ActiveEvent {
   block: TimeBlock;

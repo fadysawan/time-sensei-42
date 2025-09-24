@@ -1,10 +1,12 @@
+import { NewsTemplate, NewsInstance } from '../models';
+import { NewsService } from '../services/NewsService';
+
 export type TradingStatus = 'green' | 'amber' | 'red';
 
 export interface TimeRange {
   hours: number;
   minutes: number;
 }
-
 
 export interface TimeBlock {
   type: 'macro' | 'killzone' | 'premarket' | 'lunch' | 'news' | 'inactive';
@@ -23,14 +25,6 @@ export interface MacroSession {
   region: 'Tokyo' | 'London' | 'New York';
 }
 
-export interface NewsEvent {
-  id: string;
-  time: TimeRange;
-  name: string;
-  impact: 'high' | 'medium' | 'low';
-  region: 'Tokyo' | 'London' | 'New York';
-}
-
 export interface KillzoneSession {
   id: string;
   name: string;
@@ -46,7 +40,8 @@ export interface TradingParameters {
     premarket: { start: TimeRange; end: TimeRange };
     lunch: { start: TimeRange; end: TimeRange };
   };
-  newsEvents: NewsEvent[];
+  newsTemplates: NewsTemplate[];
+  newsInstances: NewsInstance[];
 }
 
 export const defaultTradingParameters: TradingParameters = {
@@ -134,22 +129,8 @@ export const defaultTradingParameters: TradingParameters = {
       end: { hours: 19, minutes: 0 } 
     }
   },
-  newsEvents: [
-    {
-      id: 'fomc',
-      time: { hours: 15, minutes: 30 },
-      name: "FOMC Meeting",
-      impact: 'high',
-      region: 'New York'
-    },
-    {
-      id: 'nfp',
-      time: { hours: 12, minutes: 0 },
-      name: "NFP Release", 
-      impact: 'high',
-      region: 'New York'
-    }
-  ]
+  newsTemplates: NewsService.getDefaultNewsTemplates(),
+  newsInstances: []
 };
 
 export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] => {
@@ -198,19 +179,26 @@ export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] =
     endMinute: parameters.sessions.lunch.end.minutes
   });
   
-  // Add news events
-  parameters.newsEvents.forEach(event => {
-    if (event.impact === 'high') {
-      blocks.push({
-        type: 'news',
-        name: event.name,
-        startHour: event.time.hours,
-        startMinute: event.time.minutes,
-        endHour: event.time.hours,
-        endMinute: event.time.minutes + 30 // 30 minute news block
-      });
-    }
-  });
+  // Add active news instances
+  const now = new Date();
+  parameters.newsInstances
+    .filter(instance => instance.isActive)
+    .forEach(instance => {
+      const scheduledTime = new Date(instance.scheduledTime);
+      const template = parameters.newsTemplates.find(t => t.id === instance.templateId);
+      
+      // Only show news for today (simplified check)
+      if (scheduledTime.toDateString() === now.toDateString() && template) {
+        blocks.push({
+          type: 'news',
+          name: instance.name,
+          startHour: scheduledTime.getHours(),
+          startMinute: scheduledTime.getMinutes(),
+          endHour: scheduledTime.getHours(),
+          endMinute: scheduledTime.getMinutes() + template.cooldownMinutes
+        });
+      }
+    });
   
   return blocks.sort((a, b) => {
     const aTime = a.startHour * 60 + a.startMinute;
@@ -227,56 +215,99 @@ export const getTradingStatus = (
   const currentTime = currentHour * 60 + currentMinute;
   const blocks = generateTimeBlocks(parameters);
   
-  // Check if we're in a specific time block
-  for (const block of blocks) {
-    const startTime = block.startHour * 60 + block.startMinute;
-    const endTime = block.endHour * 60 + block.endMinute;
+  // Create current date with the provided time for news checking
+  const now = new Date();
+  const currentDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), currentHour, currentMinute);
+  
+  // PRIORITY 1: Check if we're in news countdown or cooldown period - RED LIGHT
+  // Check active news instances manually to avoid circular dependency
+  const activeNewsEvents: Array<{ instance: NewsInstance; template: NewsTemplate; phase: 'countdown' | 'happening' | 'cooldown' }> = [];
+  
+  for (const instance of parameters.newsInstances.filter(i => i.isActive)) {
+    const template = parameters.newsTemplates.find(t => t.id === instance.templateId);
+    if (!template) continue;
+
+    const scheduledTime = new Date(instance.scheduledTime);
+    const countdownStartTime = new Date(scheduledTime.getTime() - (template.countdownMinutes * 60 * 1000));
+    const cooldownEndTime = new Date(scheduledTime.getTime() + (template.cooldownMinutes * 60 * 1000));
+
+    if (currentDateTime >= countdownStartTime && currentDateTime <= cooldownEndTime) {
+      let phase: 'countdown' | 'happening' | 'cooldown';
+      
+      if (currentDateTime < scheduledTime) {
+        phase = 'countdown';
+      } else if (currentDateTime.getTime() - scheduledTime.getTime() <= 60000) { // Within 1 minute of event
+        phase = 'happening';
+      } else {
+        phase = 'cooldown';
+      }
+
+      activeNewsEvents.push({ instance, template, phase });
+    }
+  }
+  
+  if (activeNewsEvents.length > 0) {
+    const activeEvent = activeNewsEvents[0]; // Get the most recent active event
+    const phase = activeEvent.phase;
+    let phaseText = '';
     
-    if (currentTime >= startTime && currentTime <= endTime) {
-      switch (block.type) {
-        case 'macro':
-        case 'killzone':
-          return {
-            status: 'green',
-            period: `${block.name} - Trading Active`,
-            nextEvent: getNextEvent(currentTime, blocks)
-          };
-        case 'premarket':
-          return {
-            status: 'amber',
-            period: 'Pre-Market Session - Caution',
-            nextEvent: getNextEvent(currentTime, blocks)
-          };
-        case 'lunch':
-        case 'news':
-          return {
-            status: 'red',
-            period: `${block.name} - Trading Halted`,
-            nextEvent: getNextEvent(currentTime, blocks)
-          };
-      }
+    switch (phase) {
+      case 'countdown':
+        phaseText = 'Countdown Period';
+        break;
+      case 'happening':
+        phaseText = 'News Event Active';
+        break;
+      case 'cooldown':
+        phaseText = 'Cooldown Period';
+        break;
     }
+    
+    return {
+      status: 'red',
+      period: `${activeEvent.instance.name} - ${phaseText}`,
+      nextEvent: getNextEvent(currentTime, blocks)
+    };
   }
   
-  // Check for upcoming news (30 minutes warning)
-  for (const block of blocks) {
-    if (block.type === 'news') {
-      const startTime = block.startHour * 60 + block.startMinute;
-      if (currentTime >= startTime - 30 && currentTime < startTime) {
-        return {
-          status: 'amber',
-          period: `Warning: ${block.name} in ${Math.ceil((startTime - currentTime))} minutes`,
-          nextEvent: getNextEvent(currentTime, blocks)
-        };
-      }
-    }
+  // PRIORITY 2: Check if we're inside a killzone
+  const currentKillzone = parameters.killzones.find(killzone => {
+    const startTime = killzone.start.hours * 60 + killzone.start.minutes;
+    const endTime = killzone.end.hours * 60 + killzone.end.minutes;
+    return currentTime >= startTime && currentTime <= endTime;
+  });
+  
+  // If outside all killzones - RED LIGHT
+  if (!currentKillzone) {
+    return {
+      status: 'red',
+      period: 'Outside Killzone - No Trading',
+      nextEvent: getNextEvent(currentTime, blocks)
+    };
   }
   
-  return {
-    status: 'red',
-    period: 'Outside Trading Hours',
-    nextEvent: getNextEvent(currentTime, blocks)
-  };
+  // PRIORITY 3: We're inside a killzone, check if also inside a macro
+  const currentMacro = parameters.macros.find(macro => {
+    const startTime = macro.start.hours * 60 + macro.start.minutes;
+    const endTime = macro.end.hours * 60 + macro.end.minutes;
+    return currentTime >= startTime && currentTime <= endTime;
+  });
+  
+  if (currentMacro) {
+    // Inside both killzone AND macro - GREEN LIGHT
+    return {
+      status: 'green',
+      period: `${currentKillzone.name} + ${currentMacro.name} - Optimal Trading`,
+      nextEvent: getNextEvent(currentTime, blocks)
+    };
+  } else {
+    // Inside killzone but outside macro - ORANGE LIGHT
+    return {
+      status: 'amber',
+      period: `${currentKillzone.name} - Caution (No Macro)`,
+      nextEvent: getNextEvent(currentTime, blocks)
+    };
+  }
 };
 
 const getNextEvent = (currentTime: number, blocks: TimeBlock[]): string => {
@@ -416,48 +447,34 @@ export const getNextKillzone = (currentHour: number, currentMinute: number, para
 
 export const getNextNewsEvent = (currentHour: number, currentMinute: number, parameters: TradingParameters): NextEvent | null => {
   const currentTime = currentHour * 60 + currentMinute;
+  const now = new Date();
   
-  // Get upcoming news events today
-  const upcomingEvents = parameters.newsEvents.filter(event => {
-    const startTime = event.time.hours * 60 + event.time.minutes;
-    return startTime > currentTime;
-  });
+  // Get upcoming active news instances for today
+  const todayInstances = parameters.newsInstances
+    .filter(instance => {
+      const scheduledTime = new Date(instance.scheduledTime);
+      return instance.isActive && scheduledTime.toDateString() === now.toDateString();
+    })
+    .filter(instance => {
+      const scheduledTime = new Date(instance.scheduledTime);
+      const eventTime = scheduledTime.getHours() * 60 + scheduledTime.getMinutes();
+      return eventTime > currentTime;
+    });
   
-  if (upcomingEvents.length > 0) {
-    // Sort by start time and get the earliest
-    const nextEvent = upcomingEvents.sort((a, b) => {
-      const aTime = a.time.hours * 60 + a.time.minutes;
-      const bTime = b.time.hours * 60 + b.time.minutes;
-      return aTime - bTime;
+  if (todayInstances.length > 0) {
+    // Sort by scheduled time and get the earliest
+    const nextInstance = todayInstances.sort((a, b) => {
+      return new Date(a.scheduledTime).getTime() - new Date(b.scheduledTime).getTime();
     })[0];
     
-    const startTime = nextEvent.time.hours * 60 + nextEvent.time.minutes;
-    return {
-      name: nextEvent.name,
-      startTime: nextEvent.time,
-      timeUntilMinutes: startTime - currentTime,
-      region: nextEvent.region,
-      impact: nextEvent.impact
-    };
-  }
-  
-  // If no more events today, get tomorrow's first event
-  if (parameters.newsEvents.length > 0) {
-    const firstEvent = parameters.newsEvents.sort((a, b) => {
-      const aTime = a.time.hours * 60 + a.time.minutes;
-      const bTime = b.time.hours * 60 + b.time.minutes;
-      return aTime - bTime;
-    })[0];
-    
-    const startTime = firstEvent.time.hours * 60 + firstEvent.time.minutes;
-    const timeUntil = (24 * 60) - currentTime + startTime;
+    const scheduledTime = new Date(nextInstance.scheduledTime);
+    const eventTime = scheduledTime.getHours() * 60 + scheduledTime.getMinutes();
     
     return {
-      name: firstEvent.name,
-      startTime: firstEvent.time,
-      timeUntilMinutes: timeUntil,
-      region: firstEvent.region,
-      impact: firstEvent.impact
+      name: nextInstance.name,
+      startTime: { hours: scheduledTime.getHours(), minutes: scheduledTime.getMinutes() },
+      timeUntilMinutes: eventTime - currentTime,
+      impact: nextInstance.impact
     };
   }
   

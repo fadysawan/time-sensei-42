@@ -14,7 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { TimePicker } from '@/components/ui/time-picker';
 import { Plus, Trash2, RotateCcw, X, ChevronDown, ChevronRight, Clock, Settings, Calendar, TrendingUp } from 'lucide-react';
-import { TradingParameters, MacroSession, NewsEvent, KillzoneSession } from '../utils/tradingLogic';
+import { MacroSession, KillzoneSession } from '../utils/tradingLogic';
+import { TradingParameters, NewsTemplate, NewsInstance } from '../models';
+import { NewsSettings } from './settings/NewsSettings';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ interface SettingsPanelProps {
   parameters: TradingParameters;
   onParametersChange: (parameters: TradingParameters) => void;
   onResetParameters: () => void;
+  isPageMode?: boolean; // New optional prop for page mode
 }
 
 export const SettingsPanel: React.FC<SettingsPanelProps> = ({
@@ -29,7 +32,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   onClose,
   parameters,
   onParametersChange,
-  onResetParameters
+  onResetParameters,
+  isPageMode = false
 }) => {
   const [localParams, setLocalParams] = useState(parameters);
   const [expandedMacros, setExpandedMacros] = useState<Set<string>>(new Set());
@@ -68,7 +72,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   };
 
   // Helper function to sort news events by time
-  const sortNewsByTime = (events: NewsEvent[]) => {
+  const sortNewsByTime = (events: NewsInstance[]) => {
     return [...events].sort((a, b) => {
       const aMinutes = timeToMinutes(a.time);
       const bMinutes = timeToMinutes(b.time);
@@ -682,120 +686,16 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
             {/* News Events Tab */}
             <TabsContent value="news" className="flex-1 overflow-y-auto mt-0 px-4">
-              <div className="bg-card rounded-lg p-3">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="text-base font-semibold">News Events</h3>
-                    <p className="text-xs text-muted-foreground">Add important news events to track</p>
-                  </div>
-                  <Button onClick={addNewsEvent} size="sm" variant="outline" className="h-8">
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add Event
-                  </Button>
-                </div>
-                <div className="space-y-2">
-                  {sortNewsByTime(localParams.newsEvents).map((event, index) => {
-                    // Find the original index in the unsorted array for change handling
-                    const originalIndex = localParams.newsEvents.findIndex(e => e.id === event.id);
-                    const isExpanded = expandedEvents.has(event.id);
-                    return (
-                    <Collapsible key={event.id} open={isExpanded} onOpenChange={() => toggleEventExpanded(event.id)}>
-                      <div className="border rounded-md bg-background/50 hover:bg-background transition-colors">
-                        <CollapsibleTrigger className="w-full p-3 text-left">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="font-medium text-sm">{event.name}</div>
-                              <div className="text-xs text-muted-foreground mt-1 flex items-center space-x-2">
-                                <span>{formatTimeDisplay(event.time)}</span>
-                                <span className={`inline-block w-2 h-2 rounded-full ${
-                                  event.impact === 'high' ? 'bg-red-500' : 
-                                  event.impact === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                                }`}></span>
-                                <span className="capitalize">{event.impact} impact</span>
-                                <span className="inline-block w-1 h-1 rounded-full bg-muted-foreground"></span>
-                                <span className="font-medium">{event.region}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              {isExpanded ? (
-                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                              )}
-                            </div>
-                          </div>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="px-3 pb-3">
-                          <div className="space-y-3 border-t pt-3 mt-3">
-                            <div>
-                              <Label className="text-xs">Event Name</Label>
-                              <Input
-                                value={event.name}
-                                onChange={(e) => handleNewsChange(originalIndex, 'name', e.target.value)}
-                                className="h-8"
-                                placeholder="Event name"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs">Session Region</Label>
-                              <Select
-                                value={event.region}
-                                onValueChange={(value) => handleNewsChange(originalIndex, 'region', value)}
-                              >
-                                <SelectTrigger className="h-8">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="Tokyo">Tokyo</SelectItem>
-                                  <SelectItem value="London">London</SelectItem>
-                                  <SelectItem value="New York">New York</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div>
-                                <Label className="text-xs">Time</Label>
-                                <TimePicker
-                                  value={event.time}
-                                  onChange={(time) => handleNewsChange(originalIndex, 'time', time)}
-                                />
-                              </div>
-                              <div>
-                                <Label className="text-xs">Impact</Label>
-                                <Select
-                                  value={event.impact}
-                                  onValueChange={(value) => handleNewsChange(originalIndex, 'impact', value)}
-                                >
-                                  <SelectTrigger className="h-8">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="low">Low</SelectItem>
-                                    <SelectItem value="medium">Medium</SelectItem>
-                                    <SelectItem value="high">High</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-                            <div className="flex justify-end pt-2">
-                              <Button
-                                onClick={() => removeNewsEvent(originalIndex)}
-                                size="sm"
-                                variant="destructive"
-                                className="h-8"
-                              >
-                                <Trash2 className="w-3 h-3 mr-1" />
-                                Delete Event
-                              </Button>
-                            </div>
-                          </div>
-                        </CollapsibleContent>
-                      </div>
-                    </Collapsible>
-                    );
-                  })}
-                </div>
-              </div>
+              <NewsSettings
+                newsTemplates={localParams.newsTemplates || []}
+                newsInstances={localParams.newsInstances || []}
+                onUpdateNewsTemplates={(templates) => 
+                  setLocalParams(prev => ({ ...prev, newsTemplates: templates }))
+                }
+                onUpdateNewsInstances={(instances) => 
+                  setLocalParams(prev => ({ ...prev, newsInstances: instances }))
+                }
+              />
             </TabsContent>
           </Tabs>
         </div>

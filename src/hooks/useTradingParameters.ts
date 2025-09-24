@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TradingParameters, defaultTradingParameters, KillzoneSession } from '../utils/tradingLogic';
+import { NewsService } from '../services';
 
 const STORAGE_KEY = 'tradingParameters';
 
@@ -49,14 +50,23 @@ export const useTradingParameters = () => {
       const savedParams = localStorage.getItem(STORAGE_KEY);
       if (savedParams) {
         const parsed = JSON.parse(savedParams);
-        // Validate that the saved data has the correct structure
-        if (parsed && typeof parsed === 'object' && parsed.macros && parsed.killzones && parsed.sessions && parsed.newsEvents) {
+        // Validate that the saved data has the correct structure and migrate if necessary
+        if (parsed && typeof parsed === 'object') {
           // Migrate old killzones format if necessary
           const migratedParams = migrateKillzones(parsed);
+          
+          // Add news properties if they don't exist (migration from old version)
+          if (!(migratedParams as any).newsTemplates) {
+            (migratedParams as any).newsTemplates = NewsService.getDefaultNewsTemplates();
+          }
+          if (!(migratedParams as any).newsInstances) {
+            (migratedParams as any).newsInstances = [];
+          }
+          
           setParameters(migratedParams);
           
           // Save the migrated parameters back to localStorage if migration occurred
-          if (migratedParams !== parsed) {
+          if (JSON.stringify(migratedParams) !== JSON.stringify(parsed)) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(migratedParams));
           }
         }

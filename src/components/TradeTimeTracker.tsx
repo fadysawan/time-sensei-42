@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Timeline } from './Timeline';
 import { TrafficLight } from './TrafficLight';
-import { SettingsPanel } from './SettingsPanel';
-import { NextEventsPanel } from './NextEventsPanel';
+
+
 import { Button } from '@/components/ui/button';
 import { Settings, Clock, TrendingUp, AlertTriangle, Timer, Zap, Calendar, Target, Newspaper, Activity, Globe, DollarSign } from 'lucide-react';
 import { useTradeTime } from '../hooks/useTradeTime';
@@ -10,7 +11,6 @@ import { useTradingParameters } from '../hooks/useTradingParameters';
 import { formatCountdownSeconds, getEventTypeStyles, getStatusStyles } from '../utils/timeUtils';
 
 export const TradeTimeTracker: React.FC = () => {
-  const [showSettings, setShowSettings] = useState(false);
   const { parameters, updateParameters, resetParameters } = useTradingParameters();
   const { 
     currentTime, 
@@ -287,15 +287,16 @@ export const TradeTimeTracker: React.FC = () => {
           
           <div className="flex items-center space-x-4">
             <TrafficLight status={tradingStatus} reason={currentPeriod} nextEvent={nextEvent} />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowSettings(true)}
-              className="trading-button border-border/50 hover:border-primary/50 hover:bg-primary/10"
-            >
-              <Settings className="h-4 w-4" />
-              <span className="hidden sm:inline">Settings</span>
-            </Button>
+            <Link to="/settings">
+              <Button
+                variant="outline"
+                size="sm"
+                className="trading-button border-border/50 hover:border-primary/50 hover:bg-primary/10"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">Settings</span>
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -410,14 +411,7 @@ export const TradeTimeTracker: React.FC = () => {
         </div>
       </main>
 
-      {/* Settings Panel */}
-      <SettingsPanel
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        parameters={parameters}
-        onParametersChange={updateParameters}
-        onResetParameters={resetParameters}
-      />
+
     </div>
   );
 };
