@@ -172,4 +172,20 @@
     background: hsl(var(--card) / 0.8);
     border: 1px solid hsl(var(--border) / 0.5);
   }
+
+  /* Border pulse animation for Current Status */
+  .animate-border-pulse {
+    animation: border-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes border-pulse {
+    0%, 100% {
+      border-opacity: 0.3;
+      box-shadow: 0 0 0 0 rgba(var(--border-rgb), 0.7);
+    }
+    50% {
+      border-opacity: 1;
+      box-shadow: 0 0 0 4px rgba(var(--border-rgb), 0);
+    }
+  }
 }

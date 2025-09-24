@@ -51,7 +51,6 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-blue-400">Trading Timeline</h2>
-        <div className="text-sm text-muted-foreground">Beirut Time (GMT+2/+3 with DST)</div>
       </div>
       
       {/* Timeline Container with enhanced styling */}
@@ -311,32 +310,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
           </div>
         </div>
         
-        {/* Add some spacing before the legend */}
-        <div className="mt-8"></div>
-        
-        {/* Enhanced Legend */}
-        <div className="flex flex-wrap gap-4 mt-4 text-xs">
-          <div className="flex items-center space-x-2 px-2 py-1 rounded-md bg-purple-500/10 border border-purple-500/20">
-            <div className="w-3 h-3 timeline-killzone rounded"></div>
-            <span className="text-purple-400">Killzone</span>
-          </div>
-          <div className="flex items-center space-x-2 px-2 py-1 rounded-md bg-blue-500/10 border border-blue-500/20">
-            <div className="w-3 h-3 timeline-macro rounded"></div>
-            <span className="text-blue-400">ICT Macro</span>
-          </div>
-          <div className="flex items-center space-x-2 px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20">
-            <div className="w-3 h-3 timeline-news rounded"></div>
-            <span className="text-orange-400">News Event</span>
-          </div>
-          <div className="flex items-center space-x-2 px-2 py-1 rounded-md bg-yellow-500/10 border border-yellow-500/20">
-            <div className="w-3 h-3 bg-yellow-400 rounded"></div>
-            <span className="text-yellow-400">Pre-Market</span>
-          </div>
-          <div className="flex items-center space-x-2 px-2 py-1 rounded-md bg-red-500/10 border border-red-500/20">
-            <div className="w-3 h-3 bg-red-400 rounded"></div>
-            <span className="text-red-400">Lunch</span>
-          </div>
-        </div>
+
       </div>
     </div>
   );
