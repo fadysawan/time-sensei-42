@@ -8,7 +8,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { TimezoneAwareTimeIntervalPicker } from '@/components/ui/timezone-aware-time-interval-picker';
 import { TimezoneAwareTimePicker } from '@/components/ui/timezone-aware-time-picker';
 import { Plus, Trash2, Zap, ChevronDown, ChevronRight, Target, Clock } from 'lucide-react';
-import { KillzoneSession } from '../../utils/tradingLogic';
+import { KillzoneSession } from '../../models';
 import { KillzoneSettingsProps, KillzoneFormState, Region } from './types';
 import { convertUTCToUserTimezone, formatTime, getTimezoneAbbreviation, calculateDuration } from '../../utils/timeUtils';
 

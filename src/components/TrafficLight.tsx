@@ -1,5 +1,5 @@
 import React from 'react';
-import { TradingStatus } from '../utils/tradingLogic';
+import { TradingStatus } from '../models';
 import { cn } from '@/lib/utils';
 
 interface TrafficLightProps {

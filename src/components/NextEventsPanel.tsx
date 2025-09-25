@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Calendar, Zap, ChevronDown, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { TradingParameters, getNextMacro, getNextKillzone, getNextNewsEvent, NextEvent } from '../utils/tradingLogic';
+import { TradingParameters } from '../models';
+import { getNextMacro, getNextKillzone, getNextNewsEvent, NextEvent } from '../utils/tradingLogic';
 import { getBeirutTime, formatCountdownDetailed, formatTime } from '../utils/timeUtils';
 
 interface NextEventsPanelProps {

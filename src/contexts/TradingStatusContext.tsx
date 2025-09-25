@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
-import { TradingParameters, getTradingStatus, TradingStatus, generateTimeBlocks, TimeBlock, isTimeInRange } from '../utils/tradingLogic';
+import { TradingParameters, TradingStatus, TimeBlock } from '../models';
+import { getTradingStatus, generateTimeBlocks, isTimeInRange } from '../utils/tradingLogic';
 import { getUTCTime, getTimeInTimezone, formatTimeSmart, formatDateForDisplay } from '../utils/timeUtils';
 import { UserConfiguration } from '../types/userConfig';
 

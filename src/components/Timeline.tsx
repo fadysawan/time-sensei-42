@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { TradingParameters, TimeBlock, generateTimeBlocks } from '../utils/tradingLogic';
+import { TradingParameters, TimeBlock } from '../models';
+import { generateTimeBlocks } from '../utils/tradingLogic';
 import { formatTime, convertUTCToUserTimezone, getTimezoneAbbreviation, calculateDuration } from '../utils/timeUtils';
 
 interface TimelineProps {
@@ -100,7 +101,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
                              px-3 py-2 bg-background border border-border text-xs rounded-lg
                              shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
                              whitespace-nowrap z-[99999] pointer-events-none
-                             min-w-max">
+                             min-w-max max-w-xs">
                 <div className="font-bold text-yellow-400 mb-1 text-sm">{block.name}</div>
                 <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
                 <div className="text-muted-foreground">
@@ -113,9 +114,20 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
                 <div className="text-xs text-muted-foreground/70 mt-1">
                   Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
                 </div>
-                <div className="text-xs text-component-purple mt-1">
-                  High Probability Zone
-                </div>
+                {block.description && (
+                  <div className="text-xs text-muted-foreground/80 mt-2 whitespace-normal">
+                    {block.description}
+                  </div>
+                )}
+                {block.probability && (
+                  <div className={`text-xs font-medium mt-1 ${
+                    block.probability === 'High' 
+                      ? 'text-green-400' 
+                      : 'text-orange-400'
+                  }`}>
+                    {block.probability} Probability
+                  </div>
+                )}
                 
                 {/* Tooltip arrow */}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 
@@ -151,7 +163,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
                            px-3 py-2 bg-background border border-border text-xs rounded-lg
                            shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
                            whitespace-nowrap z-[99999] pointer-events-none
-                           min-w-max">
+                           min-w-max max-w-xs">
               <div className="font-bold text-yellow-400 mb-1 text-sm">{block.name}</div>
               <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
               <div className="text-muted-foreground">
@@ -164,9 +176,20 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
               <div className="text-xs text-muted-foreground/70 mt-1">
                 Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
               </div>
-              <div className="text-xs text-purple-400 mt-1">
-                High Probability Zone
-              </div>
+              {block.description && (
+                <div className="text-xs text-muted-foreground/80 mt-2 whitespace-normal">
+                  {block.description}
+                </div>
+              )}
+              {block.probability && (
+                <div className={`text-xs font-medium mt-1 ${
+                  block.probability === 'High' 
+                    ? 'text-green-400' 
+                    : 'text-orange-400'
+                }`}>
+                  {block.probability} Probability
+                </div>
+              )}
               
               {/* Tooltip arrow */}
               <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 

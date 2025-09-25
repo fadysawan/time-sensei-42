@@ -1,7 +1,7 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { useUserConfiguration } from '../contexts/UserConfigurationContext';
 import { useTradingData } from '../contexts/TradingDataContext';
-import { TradingParameters } from '../utils/tradingLogic';
+import { TradingParameters } from '../models';
 
 // Combined hook that provides both user configuration and trading data
 // This maintains backward compatibility with existing components

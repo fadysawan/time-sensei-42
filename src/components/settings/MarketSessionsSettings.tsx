@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MarketSession, TimeRange } from '../../utils/tradingLogic';
+import { MarketSession, TimeRange } from '../../models';
 import { convertUTCToUserTimezone, formatTime, getTimezoneAbbreviation, calculateDuration } from '../../utils/timeUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,10 @@ export const MarketSessionsSettings: React.FC<MarketSessionsSettingsProps> = ({
   const [newSessionType, setNewSessionType] = useState<'custom'>('custom');
   const [newSessionStart, setNewSessionStart] = useState<TimeRange>({ hours: 9, minutes: 0 });
   const [newSessionEnd, setNewSessionEnd] = useState<TimeRange>({ hours: 17, minutes: 0 });
+  const [newSessionDescription, setNewSessionDescription] = useState('');
+  const [newSessionProbability, setNewSessionProbability] = useState<'High' | 'Low' | undefined>(undefined);
   const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
+  const [isAddFormExpanded, setIsAddFormExpanded] = useState(false);
 
   // Helper function to generate unique ID
   const generateId = () => {
@@ -47,14 +50,16 @@ export const MarketSessionsSettings: React.FC<MarketSessionsSettingsProps> = ({
   const handleAddSession = () => {
     if (!newSessionName.trim()) return;
 
-    const newSession: MarketSession = {
-      id: generateId(),
-      name: newSessionName.trim(),
-      start: { ...newSessionStart },
-      end: { ...newSessionEnd },
-      type: newSessionType,
-      isActive: true
-    };
+          const newSession: MarketSession = {
+            id: generateId(),
+            name: newSessionName.trim(),
+            start: { ...newSessionStart },
+            end: { ...newSessionEnd },
+            type: newSessionType,
+            isActive: true,
+            description: newSessionDescription.trim() || undefined,
+            probability: newSessionProbability || undefined
+          };
 
     const updatedSessions = [...marketSessions, newSession];
     onSessionsChange(updatedSessions);
@@ -63,6 +68,8 @@ export const MarketSessionsSettings: React.FC<MarketSessionsSettingsProps> = ({
     setNewSessionName('');
     setNewSessionStart({ hours: 9, minutes: 0 });
     setNewSessionEnd({ hours: 17, minutes: 0 });
+    setNewSessionDescription('');
+    setNewSessionProbability(undefined);
   };
 
   // Remove session
@@ -101,6 +108,26 @@ export const MarketSessionsSettings: React.FC<MarketSessionsSettingsProps> = ({
     onSessionsChange(updatedSessions);
   };
 
+  // Update session description
+  const handleSessionDescriptionChange = (sessionId: string, description: string) => {
+    const updatedSessions = marketSessions.map(session =>
+      session.id === sessionId
+        ? { ...session, description: description.trim() || undefined }
+        : session
+    );
+    onSessionsChange(updatedSessions);
+  };
+
+  // Update session probability
+  const handleSessionProbabilityChange = (sessionId: string, probability: 'High' | 'Low' | undefined) => {
+    const updatedSessions = marketSessions.map(session =>
+      session.id === sessionId
+        ? { ...session, probability }
+        : session
+    );
+    onSessionsChange(updatedSessions);
+  };
+
   // Get session type color
   const getSessionTypeColor = (type: string) => {
     switch (type) {
@@ -128,63 +155,124 @@ export const MarketSessionsSettings: React.FC<MarketSessionsSettingsProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Add New Session */}
-      <div className="border rounded-lg p-4 bg-muted/30">
-        <div className="text-sm font-medium text-cyan-400 flex items-center space-x-2 mb-4">
-          <Plus className="h-4 w-4" />
-          <span>Add New Market Session</span>
-        </div>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="session-name">Session Name</Label>
-              <Input
-                id="session-name"
-                placeholder="e.g., Asian Session"
-                value={newSessionName}
-                onChange={(e) => setNewSessionName(e.target.value)}
-              />
+      {/* Add New Session - Collapsible */}
+      <Collapsible open={isAddFormExpanded} onOpenChange={setIsAddFormExpanded}>
+        <div className="border border-cyan-500/30 rounded-lg bg-cyan-500/10">
+          <CollapsibleTrigger className="w-full p-4 hover:bg-cyan-500/20 transition-colors">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium text-cyan-400 flex items-center space-x-2">
+                <Plus className="h-4 w-4" />
+                <span>Add New Market Session</span>
+              </div>
+              {isAddFormExpanded ? (
+                <ChevronDown className="h-4 w-4 text-cyan-400" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-cyan-400" />
+              )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="session-type">Session Type</Label>
-              <Select value={newSessionType} onValueChange={(value: 'custom') => setNewSessionType(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="custom">Custom Session</SelectItem>
-                </SelectContent>
-              </Select>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="px-4 pb-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="session-name">Session Name</Label>
+                <Input
+                  id="session-name"
+                  placeholder="e.g., Asian Session"
+                  value={newSessionName}
+                  onChange={(e) => setNewSessionName(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <TimezoneAwareTimePicker
+                  label="Start Time"
+                  utcTime={newSessionStart}
+                  userTimezone={userTimezone}
+                  onTimeChange={setNewSessionStart}
+                  showTimezoneInfo={false}
+                />
+                <TimezoneAwareTimePicker
+                  label="End Time"
+                  utcTime={newSessionEnd}
+                  userTimezone={userTimezone}
+                  onTimeChange={setNewSessionEnd}
+                  showTimezoneInfo={false}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="session-type">Session Type</Label>
+                <Select value={newSessionType} onValueChange={(value: 'custom') => setNewSessionType(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="custom">Custom Session</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="session-probability">Probability (Optional)</Label>
+                <Select value={newSessionProbability || 'none'} onValueChange={(value: 'High' | 'Low' | 'none') => setNewSessionProbability(value === 'none' ? undefined : value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select probability (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Not specified</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="session-description">Description (Optional)</Label>
+                <Input
+                  id="session-description"
+                  placeholder="e.g., High volatility trading session"
+                  value={newSessionDescription}
+                  onChange={(e) => setNewSessionDescription(e.target.value)}
+                />
+              </div>
+
+              <Button 
+                onClick={handleAddSession}
+                disabled={!newSessionName.trim()}
+                className="w-full bg-cyan-600 hover:bg-cyan-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Market Session
+              </Button>
+            </div>
+          </CollapsibleContent>
+        </div>
+      </Collapsible>
+
+      {/* Sessions Summary */}
+      {sortedSessions.length > 0 && (
+        <div className="bg-muted/30 rounded-lg p-3 border border-border/30">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              {sortedSessions.length} market session{sortedSessions.length !== 1 ? 's' : ''} configured
+            </span>
+            <div className="flex items-center space-x-4 text-xs">
+              <span className="text-green-400">
+                High: {sortedSessions.filter(s => s.probability === 'High').length}
+              </span>
+              <span className="text-orange-400">
+                Low: {sortedSessions.filter(s => s.probability === 'Low').length}
+              </span>
+              <span className="text-gray-400">
+                Unspecified: {sortedSessions.filter(s => !s.probability).length}
+              </span>
+              <span className="text-blue-400">
+                Active: {sortedSessions.filter(s => s.isActive).length}
+              </span>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <TimezoneAwareTimePicker
-              label="Start Time"
-              utcTime={newSessionStart}
-              userTimezone={userTimezone}
-              onTimeChange={setNewSessionStart}
-              showTimezoneInfo={false}
-            />
-            <TimezoneAwareTimePicker
-              label="End Time"
-              utcTime={newSessionEnd}
-              userTimezone={userTimezone}
-              onTimeChange={setNewSessionEnd}
-              showTimezoneInfo={false}
-            />
-          </div>
-
-          <Button 
-            onClick={handleAddSession}
-            disabled={!newSessionName.trim()}
-            className="w-full bg-cyan-600 hover:bg-cyan-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Market Session
-          </Button>
         </div>
-      </div>
+      )}
 
       {/* Existing Sessions */}
       <div className="space-y-4">
@@ -300,6 +388,38 @@ export const MarketSessionsSettings: React.FC<MarketSessionsSettingsProps> = ({
                           onTimeChange={(time) => handleSessionTimeChange(session.id, 'end', time)}
                           showTimezoneInfo={false}
                         />
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor={`session-probability-${session.id}`} className="text-sm font-medium mb-2 block">
+                            Probability (Optional)
+                          </Label>
+                          <Select 
+                            value={session.probability || 'none'} 
+                            onValueChange={(value: 'High' | 'Low' | 'none') => handleSessionProbabilityChange(session.id, value === 'none' ? undefined : value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select probability (optional)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Not specified</SelectItem>
+                              <SelectItem value="High">High</SelectItem>
+                              <SelectItem value="Low">Low</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor={`session-description-${session.id}`} className="text-sm font-medium mb-2 block">
+                            Description (Optional)
+                          </Label>
+                          <Input
+                            id={`session-description-${session.id}`}
+                            value={session.description || ''}
+                            onChange={(e) => handleSessionDescriptionChange(session.id, e.target.value)}
+                            placeholder="Optional description for this session"
+                          />
+                        </div>
                       </div>
 
                       <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">

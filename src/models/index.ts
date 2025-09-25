@@ -1,6 +1,13 @@
 // Core data models and interfaces following Single Responsibility Principle
 
-export type TradingStatus = 'red' | 'yellow' | 'green';
+// Export all trading-related interfaces from separate files
+export type { TimeRange } from './TimeRange';
+export type { TimeBlock } from './TimeBlock';
+export type { MacroSession } from './MacroSession';
+export type { KillzoneSession } from './KillzoneSession';
+export type { MarketSession } from './MarketSession';
+export type { TradingParameters } from './TradingParameters';
+export type { TradingStatus } from './TradingStatus';
 
 // Base interface for all time-based events
 export interface BaseTimeEvent {
@@ -9,8 +16,8 @@ export interface BaseTimeEvent {
   description?: string;
 }
 
-// Interval-based events (have start and end times)
-export interface TimeBlock extends BaseTimeEvent {
+// Legacy TimeBlock interface (kept for backward compatibility)
+export interface LegacyTimeBlock extends BaseTimeEvent {
   type: 'macro' | 'killzone' | 'premarket' | 'lunch' | 'news';
   startHour: number;
   startMinute: number;
@@ -38,21 +45,22 @@ export interface NewsInstance {
 }
 
 // Union type for all event types
-export type AnyEvent = TimeBlock | NewsInstance;
+export type AnyEvent = LegacyTimeBlock | NewsInstance;
 
 export interface ActiveEvent {
-  block: TimeBlock;
+  block: LegacyTimeBlock;
   timeLeft: number; // seconds until event ends
   timeUntilStart: number; // seconds until event starts (negative if already started)
   isActive: boolean;
 }
 
 export interface UpcomingEvent {
-  block: TimeBlock;
+  block: LegacyTimeBlock;
   timeUntilStart: number; // seconds until event starts
 }
 
-export interface TradingParameters {
+// Legacy TradingParameters interface (kept for backward compatibility)
+export interface LegacyTradingParameters {
   preMarketStart: number;
   marketOpen: number;
   lunchStart: number;
@@ -60,8 +68,8 @@ export interface TradingParameters {
   marketClose: number;
   afterHoursEnd: number;
   timezone: string;
-  killzones: TimeBlock[];
-  macroEvents: TimeBlock[];
+  killzones: LegacyTimeBlock[];
+  macroEvents: LegacyTimeBlock[];
   newsTemplates: NewsTemplate[];    // Available news types
   newsInstances: NewsInstance[];    // Scheduled news occurrences
 }
@@ -118,7 +126,7 @@ export const getEventType = (event: AnyEvent): EventType => {
   if ('scheduledTime' in event) {
     return 'news';
   }
-  return (event as TimeBlock).type;
+  return (event as LegacyTimeBlock).type;
 };
 
 // Helper function to get event name from any event

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { TradingData } from '../types/tradingData';
 import { defaultTradingParameters } from '../utils/tradingLogic';
 import { NewsService } from '../services';
-import { KillzoneSession } from '../utils/tradingLogic';
+import { KillzoneSession } from '../models';
 
 const TRADING_DATA_STORAGE_KEY = 'tradingData';
 

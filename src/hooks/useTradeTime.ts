@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { TradingParameters, getTradingStatus, TradingStatus, generateTimeBlocks, TimeBlock } from '../utils/tradingLogic';
+import { TradingParameters, TradingStatus, TimeBlock } from '../models';
+import { getTradingStatus, generateTimeBlocks } from '../utils/tradingLogic';
 import { getUTCTime, getTimeInTimezone, convertUTCToUserTimezone, formatTimeSmart, formatDateForDisplay } from '../utils/timeUtils';
 import { NewsTemplate, NewsInstance } from '../models';
 import { UserConfiguration } from '../types/userConfig';

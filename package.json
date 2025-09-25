@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "build:gh-pages": "NODE_ENV=production vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node test-runner.js",
+    "test:watch": "node test-runner.js --watch"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

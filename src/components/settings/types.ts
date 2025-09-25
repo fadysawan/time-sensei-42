@@ -1,5 +1,4 @@
-import { TradingParameters, MacroSession, KillzoneSession, TimeRange } from '../../utils/tradingLogic';
-import { NewsTemplate, NewsInstance } from '../../models';
+import { TradingParameters, MacroSession, KillzoneSession, TimeRange, NewsTemplate, NewsInstance } from '../../models';
 
 // Extended trading parameters that include news functionality
 export interface ExtendedTradingParameters extends TradingParameters {
@@ -34,6 +33,8 @@ export interface MacroFormState {
   start: TimeRange;
   end: TimeRange;
   region: Region;
+  description?: string;
+  probability?: 'High' | 'Low';
 }
 
 export interface KillzoneFormState {

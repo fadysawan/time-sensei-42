@@ -1,6 +1,5 @@
 // Trading Data Types (separated from user configuration)
-import { MacroSession, KillzoneSession, MarketSession } from '../utils/tradingLogic';
-import { NewsTemplate, NewsInstance } from '../models';
+import { MacroSession, KillzoneSession, MarketSession, NewsTemplate, NewsInstance } from '../models';
 
 export interface TradingData {
   macros: MacroSession[];
@@ -11,5 +10,4 @@ export interface TradingData {
 }
 
 // Re-export the trading logic types for convenience
-export type { MacroSession, KillzoneSession, MarketSession } from '../utils/tradingLogic';
-export type { NewsTemplate, NewsInstance } from '../models';
+export type { MacroSession, KillzoneSession, MarketSession, NewsTemplate, NewsInstance } from '../models';

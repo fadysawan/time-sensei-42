@@ -1,55 +1,15 @@
-import { NewsTemplate, NewsInstance } from '../models';
+import { 
+  NewsTemplate, 
+  NewsInstance, 
+  TimeRange, 
+  TimeBlock, 
+  MacroSession, 
+  KillzoneSession, 
+  MarketSession, 
+  TradingParameters,
+  TradingStatus
+} from '../models';
 import { NewsService } from '../services/NewsService';
-
-export type TradingStatus = 'green' | 'amber' | 'red';
-
-export interface TimeRange {
-  hours: number;
-  minutes: number;
-}
-
-export interface TimeBlock {
-  type: 'macro' | 'killzone' | 'premarket' | 'market-open' | 'lunch' | 'after-hours' | 'custom' | 'news' | 'inactive';
-  name: string;
-  startHour: number;
-  startMinute: number;
-  endHour: number;
-  endMinute: number;
-}
-
-export interface MacroSession {
-  id: string;
-  name: string;
-  start: TimeRange;
-  end: TimeRange;
-  region: 'Tokyo' | 'London' | 'New York';
-}
-
-export interface KillzoneSession {
-  id: string;
-  name: string;
-  start: TimeRange;
-  end: TimeRange;
-  region: 'Tokyo' | 'London' | 'New York';
-}
-
-export interface MarketSession {
-  id: string;
-  name: string;
-  start: TimeRange;
-  end: TimeRange;
-  type: 'premarket' | 'market-open' | 'lunch' | 'after-hours' | 'custom';
-  isActive: boolean;
-}
-
-export interface TradingParameters {
-  macros: MacroSession[];
-  killzones: KillzoneSession[];
-  marketSessions: MarketSession[];
-  newsTemplates: NewsTemplate[];
-  newsInstances: NewsInstance[];
-  userTimezone: string; // User's preferred timezone for display
-}
 
 export const defaultTradingParameters: TradingParameters = {
   macros: [
@@ -58,56 +18,72 @@ export const defaultTradingParameters: TradingParameters = {
       name: 'London Session 1',
       start: { hours: 7, minutes: 33 }, // UTC: 7:33 (was 9:33 Beirut time)
       end: { hours: 8, minutes: 0 },    // UTC: 8:00 (was 10:00 Beirut time)
-      region: 'London'
+      region: 'London',
+      description: 'High volatility period during London market open',
+      probability: 'High'
     },
     {
       id: 'london-2', 
       name: 'London Session 2',
       start: { hours: 9, minutes: 3 },  // UTC: 9:03 (was 11:03 Beirut time)
       end: { hours: 9, minutes: 30 },   // UTC: 9:30 (was 11:30 Beirut time)
-      region: 'London'
+      region: 'London',
+      description: 'Second London session with moderate volatility',
+      probability: undefined
     },
     {
       id: 'ny-am-1',
       name: 'NY AM 1',
       start: { hours: 13, minutes: 50 }, // UTC: 13:50 (was 15:50 Beirut time)
       end: { hours: 14, minutes: 10 },   // UTC: 14:10 (was 16:10 Beirut time)
-      region: 'New York'
+      region: 'New York',
+      description: 'Pre-market New York session with high probability moves',
+      probability: 'High'
     },
     {
       id: 'ny-am-2',
       name: 'NY AM 2', 
       start: { hours: 14, minutes: 50 }, // UTC: 14:50 (was 16:50 Beirut time)
       end: { hours: 15, minutes: 10 },   // UTC: 15:10 (was 17:10 Beirut time)
-      region: 'New York'
+      region: 'New York',
+      description: 'Early New York session with moderate probability',
+      probability: undefined
     },
     {
       id: 'ny-am-3',
       name: 'NY AM 3',
       start: { hours: 15, minutes: 50 }, // UTC: 15:50 (was 17:50 Beirut time)
       end: { hours: 16, minutes: 10 },   // UTC: 16:10 (was 18:10 Beirut time)
-      region: 'New York'
+      region: 'New York',
+      description: 'Mid-morning New York session with high probability',
+      probability: 'High'
     },
     {
       id: 'ny-midday',
       name: 'NY Midday',
       start: { hours: 16, minutes: 50 }, // UTC: 16:50 (was 18:50 Beirut time)
       end: { hours: 17, minutes: 10 },   // UTC: 17:10 (was 19:10 Beirut time)
-      region: 'New York'
+      region: 'New York',
+      description: 'New York midday session with moderate volatility',
+      probability: 'Low'
     },
     {
       id: 'ny-pm',
       name: 'NY PM',
       start: { hours: 18, minutes: 10 }, // UTC: 18:10 (was 20:10 Beirut time)
       end: { hours: 18, minutes: 40 },   // UTC: 18:40 (was 20:40 Beirut time)
-      region: 'New York'
+      region: 'New York',
+      description: 'New York afternoon session with high probability moves',
+      probability: 'High'
     },
     {
       id: 'ny-closing',
       name: 'NY Closing',
       start: { hours: 20, minutes: 15 }, // UTC: 20:15 (was 22:15 Beirut time)
       end: { hours: 20, minutes: 45 },   // UTC: 20:45 (was 22:45 Beirut time)
-      region: 'New York'
+      region: 'New York',
+      description: 'New York market closing with high volatility',
+      probability: 'High'
     }
   ],
   killzones: [
@@ -133,7 +109,9 @@ export const defaultTradingParameters: TradingParameters = {
       start: { hours: 5, minutes: 0 },   // UTC: 5:00 (was 7:00 Beirut time)
       end: { hours: 7, minutes: 30 },    // UTC: 7:30 (was 9:30 Beirut time)
       type: 'premarket',
-      isActive: true
+      isActive: true,
+      description: 'Pre-market trading session with low liquidity',
+      probability: 'Low'
     },
     {
       id: 'lunch',
@@ -141,7 +119,9 @@ export const defaultTradingParameters: TradingParameters = {
       start: { hours: 17, minutes: 0 },  // UTC: 17:00 (was 19:00 Beirut time)
       end: { hours: 18, minutes: 0 },    // UTC: 18:00 (was 20:00 Beirut time)
       type: 'lunch',
-      isActive: true
+      isActive: true,
+      description: 'Market lunch break with reduced activity',
+      probability: undefined
     },
     {
       id: 'custom-test',
@@ -149,7 +129,9 @@ export const defaultTradingParameters: TradingParameters = {
       start: { hours: 8, minutes: 0 },   // UTC: 8:00 (was 10:00 Beirut time)
       end: { hours: 10, minutes: 0 },    // UTC: 10:00 (was 12:00 Beirut time)
       type: 'custom',
-      isActive: true
+      isActive: true,
+      description: 'Custom trading session with high probability moves',
+      probability: 'High'
     }
   ],
   newsTemplates: NewsService.getDefaultNewsTemplates(),
@@ -168,7 +150,9 @@ export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] =
       startHour: macro.start.hours,
       startMinute: macro.start.minutes,
       endHour: macro.end.hours,
-      endMinute: macro.end.minutes
+      endMinute: macro.end.minutes,
+      description: macro.description,
+      probability: macro.probability
     });
   });
   
@@ -194,7 +178,9 @@ export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] =
         startHour: session.start.hours,
         startMinute: session.start.minutes,
         endHour: session.end.hours,
-        endMinute: session.end.minutes
+        endMinute: session.end.minutes,
+        description: session.description,
+        probability: session.probability
       });
     });
   

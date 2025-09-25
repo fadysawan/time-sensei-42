@@ -1,6 +1,6 @@
 import React from 'react';
 import { TimezoneAwareTimePicker } from './timezone-aware-time-picker';
-import { TimeRange } from '../../utils/tradingLogic';
+import { TimeRange } from '../../models';
 import { Clock } from 'lucide-react';
 import { getTimezoneAbbreviation, calculateDuration, convertUTCToUserTimezone } from '../../utils/timeUtils';
 

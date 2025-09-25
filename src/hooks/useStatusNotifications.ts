@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { TradingStatus } from '../utils/tradingLogic';
+import { TradingStatus } from '../models';
 import { toast } from 'sonner';
 
 interface StatusChange {

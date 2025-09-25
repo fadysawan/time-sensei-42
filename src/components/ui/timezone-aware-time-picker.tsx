@@ -1,7 +1,7 @@
 import React from 'react';
 import { TimePicker } from './time-picker';
 import { Label } from './label';
-import { TimeRange } from '../../utils/tradingLogic';
+import { TimeRange } from '../../models';
 import { convertUTCToUserTimezone, convertUserTimezoneToUTC, getTimezoneAbbreviation } from '../../utils/timeUtils';
 import { Clock, Globe } from 'lucide-react';
 

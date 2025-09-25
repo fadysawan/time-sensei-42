@@ -7,7 +7,7 @@ import { MarketSessionsSettings } from './MarketSessionsSettings';
 import { NewsSettings } from './NewsSettings';
 import { Timeline } from '../Timeline';
 import { TradingData } from '../../types/tradingData';
-import { TradingParameters } from '../../utils/tradingLogic';
+import { TradingParameters } from '../../models';
 import { TrendingUp, Target, Clock, Newspaper, RotateCcw } from 'lucide-react';
 
 interface TradingDataSettingsProps {
