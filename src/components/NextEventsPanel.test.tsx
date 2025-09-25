@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { NextEventsPanel } from './NextEventsPanel';
+import { getNextMacro, getNextKillzone, getNextNewsEvent } from '../utils/tradingLogic';
 import { TradingParameters } from '../models';
 import { convertUTCToUserTimezone } from '../utils/timeUtils';
 
@@ -65,7 +66,6 @@ describe('NextEventsPanel', () => {
   });
 
   it('should convert UTC event times to user timezone for display', async () => {
-    const { getNextMacro } = require('../utils/tradingLogic');
     
     // Mock getNextMacro to return a UTC time
     getNextMacro.mockReturnValue({
@@ -87,7 +87,6 @@ describe('NextEventsPanel', () => {
   });
 
   it('should handle null events gracefully', () => {
-    const { getNextMacro, getNextKillzone, getNextNewsEvent } = require('../utils/tradingLogic');
     
     getNextMacro.mockReturnValue(null);
     getNextKillzone.mockReturnValue(null);
@@ -99,7 +98,6 @@ describe('NextEventsPanel', () => {
   });
 
   it('should display event times in user timezone', async () => {
-    const { getNextMacro } = require('../utils/tradingLogic');
     
     // Mock getNextMacro to return a UTC time
     getNextMacro.mockReturnValue({
@@ -118,7 +116,6 @@ describe('NextEventsPanel', () => {
   });
 
   it('should update event times when parameters change', async () => {
-    const { getNextMacro } = require('../utils/tradingLogic');
     
     getNextMacro.mockReturnValue({
       name: 'Test Macro',

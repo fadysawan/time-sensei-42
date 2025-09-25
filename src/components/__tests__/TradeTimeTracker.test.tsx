@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { TradeTimeTracker } from '../TradeTimeTracker';
+import { convertUTCToUserTimezone } from '../../utils/timeUtils';
 
 // Mock the contexts
 jest.mock('../../contexts/TradingStatusContext', () => ({
@@ -93,7 +94,6 @@ describe('TradeTimeTracker Timezone Display', () => {
 
     await waitFor(() => {
       // Verify that convertUTCToUserTimezone was called with the correct parameters
-      const { convertUTCToUserTimezone } = require('../../utils/timeUtils');
       expect(convertUTCToUserTimezone).toHaveBeenCalledWith(8, 0, 'Asia/Beirut');
     });
 

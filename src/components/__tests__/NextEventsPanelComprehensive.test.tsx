@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { NextEventsPanel } from '../NextEventsPanel';
 import { TradingParameters } from '../../models';
+import { getNextMacro, getNextKillzone, getNextNewsEvent } from '../../utils/tradingLogic';
+import { convertUTCToUserTimezone, formatTime } from '../../utils/timeUtils';
 
 // Mock the trading logic functions
 jest.mock('../../utils/tradingLogic', () => ({
@@ -72,13 +74,11 @@ describe('NextEventsPanel Comprehensive Tests', () => {
 
     await waitFor(() => {
       // Verify that convertUTCToUserTimezone was called with the correct parameters
-      const { convertUTCToUserTimezone } = require('../../utils/timeUtils');
       expect(convertUTCToUserTimezone).toHaveBeenCalledWith(8, 0, 'Asia/Beirut');
     });
 
     await waitFor(() => {
       // Verify that formatTime was called with the converted time (11:00)
-      const { formatTime } = require('../../utils/timeUtils');
       expect(formatTime).toHaveBeenCalledWith(11, 0);
     });
   });
@@ -93,7 +93,6 @@ describe('NextEventsPanel Comprehensive Tests', () => {
 
     await waitFor(() => {
       // Verify that convertUTCToUserTimezone was called with New York timezone
-      const { convertUTCToUserTimezone } = require('../../utils/timeUtils');
       expect(convertUTCToUserTimezone).toHaveBeenCalledWith(8, 0, 'America/New_York');
     });
   });
@@ -108,13 +107,11 @@ describe('NextEventsPanel Comprehensive Tests', () => {
 
     await waitFor(() => {
       // Verify that convertUTCToUserTimezone was called with UTC timezone
-      const { convertUTCToUserTimezone } = require('../../utils/timeUtils');
       expect(convertUTCToUserTimezone).toHaveBeenCalledWith(8, 0, 'UTC');
     });
 
     await waitFor(() => {
       // For UTC, the time should remain the same (8:00)
-      const { formatTime } = require('../../utils/timeUtils');
       expect(formatTime).toHaveBeenCalledWith(8, 0);
     });
   });
@@ -124,7 +121,6 @@ describe('NextEventsPanel Comprehensive Tests', () => {
 
     // Wait for initial render
     await waitFor(() => {
-      const { convertUTCToUserTimezone } = require('../../utils/timeUtils');
       expect(convertUTCToUserTimezone).toHaveBeenCalledWith(8, 0, 'Asia/Beirut');
     });
 
@@ -138,13 +134,11 @@ describe('NextEventsPanel Comprehensive Tests', () => {
 
     await waitFor(() => {
       // Should be called with the new timezone
-      const { convertUTCToUserTimezone } = require('../../utils/timeUtils');
       expect(convertUTCToUserTimezone).toHaveBeenCalledWith(8, 0, 'Europe/London');
     });
   });
 
   it('should handle null events gracefully', () => {
-    const { getNextMacro, getNextKillzone, getNextNewsEvent } = require('../../utils/tradingLogic');
     
     getNextMacro.mockReturnValue(null);
     getNextKillzone.mockReturnValue(null);

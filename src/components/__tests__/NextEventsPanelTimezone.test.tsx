@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { NextEventsPanel } from '../NextEventsPanel';
 import { TradingParameters } from '../../models';
+import { getNextMacro, getNextKillzone, getNextNewsEvent } from '../../utils/tradingLogic';
+import { convertUTCToUserTimezone, formatTime } from '../../utils/timeUtils';
 
 // Mock the trading logic functions
 jest.mock('../../utils/tradingLogic', () => ({
@@ -71,13 +73,11 @@ describe('NextEventsPanel Timezone Display', () => {
 
     await waitFor(() => {
       // Verify that convertUTCToUserTimezone was called
-      const { convertUTCToUserTimezone } = require('../../utils/timeUtils');
       expect(convertUTCToUserTimezone).toHaveBeenCalledWith(8, 0, 'Asia/Beirut');
     });
 
     await waitFor(() => {
       // Verify that formatTime was called with the converted time (11:00)
-      const { formatTime } = require('../../utils/timeUtils');
       expect(formatTime).toHaveBeenCalledWith(11, 0);
     });
   });
