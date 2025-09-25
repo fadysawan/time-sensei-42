@@ -117,4 +117,17 @@ Feature: Show Seconds Configuration
     And the tests should verify component integration
     And the tests should verify configuration change detection
     And the tests should verify edge cases and error conditions
+    And the tests should verify the showSeconds fix in TradingStatusContext
+    And the tests should verify that shouldShowSeconds is passed to formatTimeSmart
+    And the tests should verify that config.showSeconds is not directly passed to formatTimeSmart
     And all showSeconds unit tests should pass
+
+  Scenario: ShowSeconds fix validation
+    Given I have a TradingStatusContext with showSeconds configuration
+    When the context formats time displays
+    Then formatTimeSmart should receive the calculated shouldShowSeconds value
+    And formatTimeSmart should not receive the raw config.showSeconds value
+    And the time displays should show seconds when showSeconds is enabled
+    And the time displays should not show seconds when showSeconds is disabled
+    And the time displays should show seconds when countdown is below 5 minutes
+    And the fix should be validated by unit tests

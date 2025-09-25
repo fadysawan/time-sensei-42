@@ -244,35 +244,35 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
       utcTimeInfo.hours, 
       utcTimeInfo.minutes, 
       shouldShowSeconds ? utcTimeInfo.seconds : undefined, 
-      config.displayPreferences.showSeconds,
+      shouldShowSeconds,
       countdownMinutes
     ));
     setCurrentTime(formatTimeSmart(
       userTime.hours, 
       userTime.minutes, 
       shouldShowSeconds ? userTime.seconds : undefined, 
-      config.displayPreferences.showSeconds,
+      shouldShowSeconds,
       countdownMinutes
     ));
     setNewYorkTime(formatTimeSmart(
       nyTime.hours, 
       nyTime.minutes, 
       shouldShowSeconds ? nyTime.seconds : undefined, 
-      config.displayPreferences.showSeconds,
+      shouldShowSeconds,
       countdownMinutes
     ));
     setLondonTime(formatTimeSmart(
       londonTimeInfo.hours, 
       londonTimeInfo.minutes, 
       shouldShowSeconds ? londonTimeInfo.seconds : undefined, 
-      config.displayPreferences.showSeconds,
+      shouldShowSeconds,
       countdownMinutes
     ));
     setTokyoTime(formatTimeSmart(
       tokyoTimeInfo.hours, 
       tokyoTimeInfo.minutes, 
       shouldShowSeconds ? tokyoTimeInfo.seconds : undefined, 
-      config.displayPreferences.showSeconds,
+      shouldShowSeconds,
       countdownMinutes
     ));
     
