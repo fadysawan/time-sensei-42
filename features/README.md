@@ -20,6 +20,18 @@ This file documents the comprehensive unit test coverage for the application. It
 - Test structure and organization
 - Test coverage and validation
 - Test execution and maintenance
+- Timezone conversion tests
+- Component timezone display tests
+- Comprehensive timezone testing scenarios
+
+### `timezone-conversion.feature`
+This file documents the timezone conversion and display functionality. It covers:
+- UTC to user timezone conversion
+- Edge cases and error handling
+- Component timezone display (NextEventsPanel, TradeTimeTracker)
+- Unit test coverage for timezone functionality
+- Performance and reliability considerations
+- Cross-browser compatibility
 
 ## How to Use These Files
 

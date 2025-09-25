@@ -198,6 +198,49 @@ Feature: Unit Tests for Trading Session Management
     And the test results should be included in build reports
     And the build process should be reliable
 
+  Scenario: Timezone Conversion Tests
+    Given I have timezone conversion functionality
+    When I run the timezone conversion tests
+    Then the tests should verify UTC to user timezone conversion
+    And the tests should verify conversion accuracy for different timezones
+    And the tests should verify edge cases (midnight, DST transitions)
+    And the tests should verify error handling for invalid timezones
+    And the tests should verify Intl.DateTimeFormat usage
+    And the tests should verify formatToParts functionality
+    And the tests should verify fallback behavior
+    And all timezone conversion tests should pass
+
+  Scenario: NextEventsPanel Timezone Display Tests
+    Given I have NextEventsPanel component tests
+    When I run the NextEventsPanel timezone tests
+    Then the tests should verify event times are displayed in user timezone
+    And the tests should verify UTC to user timezone conversion in display
+    And the tests should verify timezone consistency across different events
+    And the tests should verify proper time formatting
+    And the tests should verify timezone conversion for different user timezones
+    And all NextEventsPanel timezone tests should pass
+
+  Scenario: TradeTimeTracker Timezone Display Tests
+    Given I have TradeTimeTracker component tests
+    When I run the TradeTimeTracker timezone tests
+    Then the tests should verify upcoming events display in user timezone
+    And the tests should verify convertUTCToUserTimezone is called correctly
+    And the tests should verify event times are converted from UTC to user timezone
+    And the tests should verify proper time formatting in the UI
+    And the tests should verify timezone conversion for different user timezones
+    And the tests should verify mock timezone conversion functionality
+    And all TradeTimeTracker timezone tests should pass
+
+  Scenario: Comprehensive Timezone Testing
+    Given I have comprehensive timezone test coverage
+    When I run all timezone-related tests
+    Then the tests should cover timezone conversion utilities
+    And the tests should cover component timezone display
+    And the tests should cover edge cases and error conditions
+    And the tests should cover different timezone scenarios
+    And the tests should verify consistent timezone handling
+    And all timezone tests should pass successfully
+
   Scenario: Test Documentation and Readability
     Given I have unit tests for the application
     When I review the test code

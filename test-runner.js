@@ -226,6 +226,7 @@ function validateGherkinScenarios() {
     // Check if Gherkin files exist
     const optionalProbabilityFeature = readFileSync(join(__dirname, 'features/optional-probability.feature'), 'utf8');
     const unitTestsFeature = readFileSync(join(__dirname, 'features/unit-tests.feature'), 'utf8');
+    const timezoneConversionFeature = readFileSync(join(__dirname, 'features/timezone-conversion.feature'), 'utf8');
     
     test('Optional Probability Gherkin file exists and is valid', () => {
       expect(optionalProbabilityFeature).toContain('Feature: Optional Probability for Trading Sessions');
@@ -243,6 +244,14 @@ function validateGherkinScenarios() {
       expect(unitTestsFeature).toContain('Then');
     });
     
+    test('Timezone Conversion Gherkin file exists and is valid', () => {
+      expect(timezoneConversionFeature).toContain('Feature: Timezone Conversion and Display');
+      expect(timezoneConversionFeature).toContain('Scenario:');
+      expect(timezoneConversionFeature).toContain('Given');
+      expect(timezoneConversionFeature).toContain('When');
+      expect(timezoneConversionFeature).toContain('Then');
+    });
+    
     test('Gherkin files cover all major functionality', () => {
       expect(optionalProbabilityFeature).toContain('MacroSession');
       expect(optionalProbabilityFeature).toContain('MarketSession');
@@ -253,6 +262,13 @@ function validateGherkinScenarios() {
       expect(unitTestsFeature).toContain('MarketSessionsSettings');
       expect(unitTestsFeature).toContain('TimeBlock');
       expect(unitTestsFeature).toContain('TradingParameters');
+      expect(unitTestsFeature).toContain('Timezone Conversion Tests');
+      expect(unitTestsFeature).toContain('TradeTimeTracker Timezone Display Tests');
+      
+      expect(timezoneConversionFeature).toContain('convertUTCToUserTimezone');
+      expect(timezoneConversionFeature).toContain('NextEventsPanel');
+      expect(timezoneConversionFeature).toContain('TradeTimeTracker');
+      expect(timezoneConversionFeature).toContain('Intl.DateTimeFormat');
     });
     
     console.log('✅ Gherkin scenarios are properly documented');
