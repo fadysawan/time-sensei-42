@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, Calendar, Zap, ChevronDown, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { TradingParameters } from '../models';
 import { getNextMacro, getNextKillzone, getNextNewsEvent, NextEvent } from '../utils/tradingLogic';
-import { getBeirutTime, formatCountdownDetailed, formatTime } from '../utils/timeUtils';
+import { getBeirutTime, formatCountdownDetailed, formatTime, convertUTCToUserTimezone, getUTCTime } from '../utils/timeUtils';
 
 interface NextEventsPanelProps {
   parameters: TradingParameters;
@@ -173,19 +173,24 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
   const [futureNewsEvents, setFutureNewsEvents] = useState<NextEvent[]>([]);
 
   // Get next occurrence after the immediate next event
-  const getNextAfter = (currentEvent: NextEvent | null, events: (MacroSession | KillzoneSession | NewsInstance)[], timeField: string = 'start'): NextEvent | null => {
+  const getNextAfter = useCallback((currentEvent: NextEvent | null, events: (MacroSession | KillzoneSession | NewsInstance)[], timeField: string = 'start'): NextEvent | null => {
     if (!currentEvent) return null;
     
     const currentEventTime = currentEvent.timeUntilMinutes;
+    const utcTime = getUTCTime();
+    
     return events
       .map(event => {
         const time = timeField === 'start' ? event.start : event.time;
         const startTime = time.hours * 60 + time.minutes;
-        const timeUntil = startTime - (new Date().getHours() * 60 + new Date().getMinutes());
+        const timeUntil = startTime - (utcTime.hours * 60 + utcTime.minutes);
+        
+        // Convert UTC time to user timezone for display
+        const userTime = convertUTCToUserTimezone(time.hours, time.minutes, parameters.userTimezone);
         
         return {
           name: event.name,
-          startTime: time,
+          startTime: userTime,
           timeUntilMinutes: timeUntil > 0 ? timeUntil : timeUntil + 24 * 60,
           region: event.region,
           impact: event.impact
@@ -193,22 +198,27 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
       })
       .filter(event => event.timeUntilMinutes > currentEventTime)
       .sort((a, b) => a.timeUntilMinutes - b.timeUntilMinutes)[0] || null;
-  };
+  }, [parameters.userTimezone]);
 
   // Get future events of specific type
-  const getFutureEventsOfType = (currentEvent: NextEvent | null, events: (MacroSession | KillzoneSession | NewsInstance)[], timeField: string = 'start'): NextEvent[] => {
+  const getFutureEventsOfType = useCallback((currentEvent: NextEvent | null, events: (MacroSession | KillzoneSession | NewsInstance)[], timeField: string = 'start'): NextEvent[] => {
     if (!currentEvent) return [];
     
     const currentEventTime = currentEvent.timeUntilMinutes;
+    const utcTime = getUTCTime();
+    
     return events
       .map(event => {
         const time = timeField === 'start' ? event.start : event.time;
         const startTime = time.hours * 60 + time.minutes;
-        const timeUntil = startTime - (new Date().getHours() * 60 + new Date().getMinutes());
+        const timeUntil = startTime - (utcTime.hours * 60 + utcTime.minutes);
+        
+        // Convert UTC time to user timezone for display
+        const userTime = convertUTCToUserTimezone(time.hours, time.minutes, parameters.userTimezone);
         
         return {
           name: event.name,
-          startTime: time,
+          startTime: userTime,
           timeUntilMinutes: timeUntil > 0 ? timeUntil : timeUntil + 24 * 60,
           region: event.region,
           impact: event.impact
@@ -216,19 +226,29 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
       })
       .filter(event => event.timeUntilMinutes > currentEventTime)
       .sort((a, b) => a.timeUntilMinutes - b.timeUntilMinutes);
-  };
+  }, [parameters.userTimezone]);
 
   useEffect(() => {
     const updateNextEvents = () => {
-      const beirutTime = getBeirutTime();
+      const utcTime = getUTCTime();
       
-      const macro = getNextMacro(beirutTime.hours, beirutTime.minutes, parameters);
-      const killzone = getNextKillzone(beirutTime.hours, beirutTime.minutes, parameters);
-      const newsEvent = getNextNewsEvent(beirutTime.hours, beirutTime.minutes, parameters);
+      const macro = getNextMacro(utcTime.hours, utcTime.minutes, parameters);
+      const killzone = getNextKillzone(utcTime.hours, utcTime.minutes, parameters);
+      const newsEvent = getNextNewsEvent(utcTime.hours, utcTime.minutes, parameters);
       
-      setNextMacro(macro);
-      setNextKillzone(killzone);
-      setNextNewsEvent(newsEvent);
+      // Convert event times to user timezone for display
+      const convertEventToUserTimezone = (event: NextEvent | null): NextEvent | null => {
+        if (!event) return null;
+        const userTime = convertUTCToUserTimezone(event.startTime.hours, event.startTime.minutes, parameters.userTimezone);
+        return {
+          ...event,
+          startTime: userTime
+        };
+      };
+      
+      setNextMacro(convertEventToUserTimezone(macro));
+      setNextKillzone(convertEventToUserTimezone(killzone));
+      setNextNewsEvent(convertEventToUserTimezone(newsEvent));
       
       // Get next occurrence after current
       setNextMacroAfter(getNextAfter(macro, parameters.macros, 'start'));
@@ -248,7 +268,7 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
     const interval = setInterval(updateNextEvents, 1000);
     
     return () => clearInterval(interval);
-  }, [parameters]);
+  }, [parameters, getNextAfter, getFutureEventsOfType]);
 
   return (
     <div className="trading-card p-4 trading-hover">
