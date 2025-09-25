@@ -4,6 +4,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { TradingParameters } from '../models';
 import { getNextMacro, getNextKillzone, getNextNewsEvent, NextEvent } from '../utils/tradingLogic';
 import { getBeirutTime, formatCountdownDetailed, formatTime, convertUTCToUserTimezone, getUTCTime } from '../utils/timeUtils';
+import { useUserConfiguration } from '../contexts/UserConfigurationContext';
 
 interface NextEventsPanelProps {
   parameters: TradingParameters;
@@ -22,6 +23,7 @@ interface CompactEventProps {
 const CompactEvent: React.FC<CompactEventProps> = ({ title, icon, event, nextEvent, futureEvents, color, parameters }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { config } = useUserConfiguration();
 
   if (!event) {
     return (
@@ -44,8 +46,8 @@ const CompactEvent: React.FC<CompactEventProps> = ({ title, icon, event, nextEve
     );
   }
 
-  const countdownInfo = formatCountdownDetailed(event.timeUntilMinutes);
-  const nextCountdownInfo = nextEvent ? formatCountdownDetailed(nextEvent.timeUntilMinutes) : null;
+  const countdownInfo = formatCountdownDetailed(event.timeUntilMinutes, config.displayPreferences.showSeconds);
+  const nextCountdownInfo = nextEvent ? formatCountdownDetailed(nextEvent.timeUntilMinutes, config.displayPreferences.showSeconds) : null;
   
   return (
     <Collapsible open={!isCollapsed} onOpenChange={setIsCollapsed}>
@@ -124,7 +126,7 @@ const CompactEvent: React.FC<CompactEventProps> = ({ title, icon, event, nextEve
                 <div className="text-xs font-medium text-blue-400/80 mb-1">Upcoming {title}s</div>
                 <div className="space-y-1">
                   {futureEvents.slice(0, 4).map((futureEvent, index) => {
-                    const futureCountdownInfo = formatCountdownDetailed(futureEvent.timeUntilMinutes);
+                    const futureCountdownInfo = formatCountdownDetailed(futureEvent.timeUntilMinutes, config.displayPreferences.showSeconds);
                     
                     return (
                       <div key={index} className="flex items-center justify-between py-0.5 trading-hover rounded px-2 -mx-2">

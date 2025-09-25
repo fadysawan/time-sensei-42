@@ -489,6 +489,49 @@ export const formatDateForDisplay = (timezone: string): string => {
   return date;
 };
 
+// Format countdown from minutes input (for NextEventsPanel)
+export const formatCountdownDetailed = (totalMinutes: number, showSeconds?: boolean): { display: string; isUrgent: boolean; isSoon: boolean } => {
+  if (totalMinutes <= 0) {
+    return { display: 'Now', isUrgent: true, isSoon: true };
+  }
+  
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  
+  let display = '';
+  
+  // Show seconds if user preference is enabled and countdown is below 5 minutes
+  const shouldShowSeconds = showSeconds && totalMinutes < 5;
+  
+  if (shouldShowSeconds) {
+    // For seconds display, we need to convert minutes to seconds
+    const totalSeconds = Math.floor(totalMinutes * 60);
+    const displayHours = Math.floor(totalSeconds / 3600);
+    const displayMinutes = Math.floor((totalSeconds % 3600) / 60);
+    const displaySeconds = totalSeconds % 60;
+    
+    if (displayHours > 0) {
+      display = `${displayHours}h ${displayMinutes}m ${displaySeconds}s`;
+    } else if (displayMinutes > 0) {
+      display = `${displayMinutes}m ${displaySeconds}s`;
+    } else {
+      display = `${displaySeconds}s`;
+    }
+  } else {
+    if (hours > 0) {
+      display = `${hours}h ${minutes}m`;
+    } else {
+      display = `${minutes}m`;
+    }
+  }
+  
+  return {
+    display,
+    isUrgent: totalMinutes <= 5,  // Less than 5 minutes
+    isSoon: totalMinutes <= 30    // Less than 30 minutes
+  };
+};
+
 // Re-export functions from other modules for convenience
 export const formatCountdownSeconds = CountdownService.formatCountdownSeconds;
 export { getEventTypeStyles, getStatusStyles };

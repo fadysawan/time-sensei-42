@@ -4,10 +4,12 @@ import { Timeline } from './Timeline';
 import { TrendingUp, AlertTriangle, Timer, Zap, Calendar, Target, Newspaper, Activity, Globe, DollarSign } from 'lucide-react';
 import { useTradingStatus } from '../contexts/TradingStatusContext';
 import { useTradingParameters } from '../hooks/useTradingParameters';
+import { useUserConfiguration } from '../contexts/UserConfigurationContext';
 import { formatCountdownSeconds, formatCountdownSmart, getEventTypeStyles, getStatusStyles, convertUTCToUserTimezone } from '../utils/timeUtils';
 
 export const TradeTimeTracker: React.FC = () => {
   const { parameters } = useTradingParameters();
+  const { config } = useUserConfiguration();
   const { 
     currentTime,
     tradingStatus, 
@@ -30,7 +32,7 @@ export const TradeTimeTracker: React.FC = () => {
     hours, 
     minutes, 
     seconds, 
-    false, // showSeconds will be handled by the context
+    config.displayPreferences.showSeconds, // Use user's showSeconds preference
     countdownMinutes
   );
   const statusStyles = getStatusStyles(tradingStatus);
@@ -79,7 +81,7 @@ export const TradeTimeTracker: React.FC = () => {
               hours, 
               minutes, 
               seconds, 
-              false, // showSeconds will be handled by the context
+              config.displayPreferences.showSeconds, // Use user's showSeconds preference
               countdownMinutes
             );
             
@@ -231,7 +233,7 @@ export const TradeTimeTracker: React.FC = () => {
             hours, 
             minutes, 
             seconds, 
-            false, // showSeconds will be handled by the context
+            config.displayPreferences.showSeconds, // Use user's showSeconds preference
             countdownMinutes
           );
           
