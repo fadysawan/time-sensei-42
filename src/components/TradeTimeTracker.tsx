@@ -4,7 +4,7 @@ import { Timeline } from './Timeline';
 import { TrendingUp, AlertTriangle, Timer, Zap, Calendar, Target, Newspaper, Activity, Globe, DollarSign } from 'lucide-react';
 import { useTradingStatus } from '../contexts/TradingStatusContext';
 import { useTradingParameters } from '../hooks/useTradingParameters';
-import { formatCountdownSeconds, formatCountdownSmart, getEventTypeStyles, getStatusStyles } from '../utils/timeUtils';
+import { formatCountdownSeconds, formatCountdownSmart, getEventTypeStyles, getStatusStyles, convertUTCToUserTimezone } from '../utils/timeUtils';
 
 export const TradeTimeTracker: React.FC = () => {
   const { parameters } = useTradingParameters();
@@ -217,7 +217,10 @@ export const TradeTimeTracker: React.FC = () => {
         {upcomingEvents.slice(0, 6).map((event, index) => {
           const eventStyles = getEventTypeStyles(event.block.type);
           const countdown = formatCountdownSeconds(event.timeUntilStart);
-          const startTime = `${String(event.block.startHour).padStart(2, '0')}:${String(event.block.startMinute).padStart(2, '0')}`;
+          
+          // Convert UTC time to user timezone for display
+          const userTime = convertUTCToUserTimezone(event.block.startHour, event.block.startMinute, parameters.userTimezone);
+          const startTime = `${String(userTime.hours).padStart(2, '0')}:${String(userTime.minutes).padStart(2, '0')}`;
           
           // Use smart formatting for countdown display
           const countdownMinutes = Math.floor(event.timeUntilStart / 60);
