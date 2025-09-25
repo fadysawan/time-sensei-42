@@ -3,7 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a1d23" />
     <title>Trade Time Tracker - ICT Macros & Killzones</title>
+    
+    <!-- Theme initialization script to prevent flash -->
+    <script>
+      (function() {
+        try {
+          const savedTheme = localStorage.getItem('userConfiguration');
+          let theme = 'dark'; // default theme
+          
+          if (savedTheme) {
+            const config = JSON.parse(savedTheme);
+            if (config.displayPreferences && config.displayPreferences.theme) {
+              theme = config.displayPreferences.theme;
+            }
+          }
+          
+          // Apply theme immediately
+          document.documentElement.classList.add(theme);
+          
+          // Update meta theme-color
+          const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', theme === 'dark' ? '#1a1d23' : '#ffffff');
+          }
+        } catch (e) {
+          // Fallback to dark theme if there's an error
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     <meta name="description" content="Professional trading time tracker for ICT macros, killzones, and market sessions with real-time status indicators" />
     <meta name="author" content="Trade Time Tracker" />
 

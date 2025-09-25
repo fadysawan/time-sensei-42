@@ -39,17 +39,17 @@ export const TradeTimeTracker: React.FC = () => {
   const getEventIcon = (eventType: string, size: string = "w-4 h-4") => {
     switch (eventType) {
       case 'macro':
-        return <TrendingUp className={`${size} text-blue-400`} />;
+        return <TrendingUp className={`${size} text-component-blue`} />;
       case 'killzone':
-        return <Target className={`${size} text-purple-400`} />;
+        return <Target className={`${size} text-component-purple`} />;
       case 'news':
-        return <Newspaper className={`${size} text-orange-400`} />;
+        return <Newspaper className={`${size} text-component-orange`} />;
       case 'premarket':
-        return <Activity className={`${size} text-yellow-400`} />;
+        return <Activity className={`${size} text-component-yellow`} />;
       case 'lunch':
-        return <DollarSign className={`${size} text-red-400`} />;
+        return <DollarSign className={`${size} text-component-red`} />;
       default:
-        return <Globe className={`${size} text-gray-400`} />;
+        return <Globe className={`${size} text-muted-foreground`} />;
     }
   };
 
@@ -61,7 +61,7 @@ export const TradeTimeTracker: React.FC = () => {
         <h4 className="text-sm font-medium text-muted-foreground flex items-center space-x-2">
           <TrendingUp className="w-3.5 h-3.5" />
           <span>Active Events</span>
-          <span className="text-xs bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full font-medium">
+          <span className="text-xs bg-component-green/20 text-component-green px-1.5 py-0.5 rounded-full font-medium">
             {activeEvents.length}
           </span>
         </h4>
@@ -98,7 +98,7 @@ export const TradeTimeTracker: React.FC = () => {
                       <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold uppercase ${eventStyles.badge}`}>
                         {activeEvent.block.type}
                       </span>
-                      <span className="text-xs bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded-full font-medium uppercase">
+                      <span className="text-xs bg-component-green/20 text-component-green px-1.5 py-0.5 rounded-full font-medium uppercase">
                         LIVE
                       </span>
                     </div>
@@ -106,8 +106,8 @@ export const TradeTimeTracker: React.FC = () => {
                   <div className="text-right">
                     <div className="text-xs text-muted-foreground mb-0.5">Ends in:</div>
                     <span className={`font-mono font-bold text-sm ${
-                      eventCountdown.isUrgent ? 'text-red-400 animate-pulse' : 
-                      eventCountdown.isSoon ? 'text-yellow-400' : 'text-green-400'
+                      eventCountdown.isUrgent ? 'text-component-red animate-pulse' : 
+                      eventCountdown.isSoon ? 'text-component-yellow' : 'text-component-green'
                     }`}>
                       {smartCountdown}
                     </span>
@@ -135,15 +135,15 @@ export const TradeTimeTracker: React.FC = () => {
     return (
       <div className="grid grid-cols-1 gap-3">
         {/* Next Macro */}
-        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+        <div className="p-3 rounded-lg bg-component-blue/10 border border-component-blue/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <TrendingUp className="h-4 w-4 text-blue-400" />
-              <span className="text-sm font-medium text-blue-400">Next Macro</span>
+              <TrendingUp className="h-4 w-4 text-component-blue" />
+              <span className="text-sm font-medium text-component-blue">Next Macro</span>
             </div>
             {nextMacro ? (
               <div className="text-right">
-                <div className="text-xs font-mono text-blue-400">
+                <div className="text-xs font-mono text-component-blue">
                   {formatCountdownSeconds(nextMacro.timeUntilStart).display}
                 </div>
                 <div className="text-xs text-muted-foreground truncate max-w-20">
@@ -157,15 +157,15 @@ export const TradeTimeTracker: React.FC = () => {
         </div>
 
         {/* Next Killzone */}
-        <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+        <div className="p-3 rounded-lg bg-component-purple/10 border border-component-purple/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Zap className="h-4 w-4 text-purple-400" />
-              <span className="text-sm font-medium text-purple-400">Next Killzone</span>
+              <Zap className="h-4 w-4 text-component-purple" />
+              <span className="text-sm font-medium text-component-purple">Next Killzone</span>
             </div>
             {nextKillzone ? (
               <div className="text-right">
-                <div className="text-xs font-mono text-purple-400">
+                <div className="text-xs font-mono text-component-purple">
                   {formatCountdownSeconds(nextKillzone.timeUntilStart).display}
                 </div>
                 <div className="text-xs text-muted-foreground truncate max-w-20">
@@ -179,15 +179,15 @@ export const TradeTimeTracker: React.FC = () => {
         </div>
 
         {/* Next News */}
-        <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+        <div className="p-3 rounded-lg bg-component-orange/10 border border-component-orange/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Calendar className="h-4 w-4 text-orange-400" />
-              <span className="text-sm font-medium text-orange-400">Next News</span>
+              <Calendar className="h-4 w-4 text-component-orange" />
+              <span className="text-sm font-medium text-component-orange">Next News</span>
             </div>
             {nextNews ? (
               <div className="text-right">
-                <div className="text-xs font-mono text-orange-400">
+                <div className="text-xs font-mono text-component-orange">
                   {formatCountdownSeconds(nextNews.timeUntilStart).display}
                 </div>
                 <div className="text-xs text-muted-foreground truncate max-w-20">
@@ -251,7 +251,7 @@ export const TradeTimeTracker: React.FC = () => {
                         {event.block.type}
                       </span>
                       {index === 0 && (
-                        <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full uppercase font-medium flex-shrink-0">
+                        <span className="text-xs bg-component-blue text-white px-1.5 py-0.5 rounded-full uppercase font-medium flex-shrink-0">
                           NEXT
                         </span>
                       )}
@@ -265,9 +265,9 @@ export const TradeTimeTracker: React.FC = () => {
                 </div>
                 <div className="text-right ml-2 flex-shrink-0">
                   <div className={`font-mono font-semibold text-sm ${
-                    countdown.isUrgent ? 'text-red-400' : 
-                    countdown.isSoon ? 'text-yellow-400' : 
-                    'text-blue-400'
+                    countdown.isUrgent ? 'text-component-red' : 
+                    countdown.isSoon ? 'text-component-yellow' : 
+                    'text-component-blue'
                   }`}>
                     {smartCountdown}
                   </div>
@@ -276,8 +276,8 @@ export const TradeTimeTracker: React.FC = () => {
               
               {countdown.isUrgent && (
                 <div className="mt-2 pt-1.5 border-t border-border/20">
-                  <div className="flex items-center space-x-1.5 text-red-400">
-                    <div className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse"></div>
+                  <div className="flex items-center space-x-1.5 text-component-red">
+                    <div className="w-1.5 h-1.5 bg-component-red rounded-full animate-pulse"></div>
                     <span className="text-xs font-medium">Starting soon</span>
                   </div>
                 </div>
@@ -305,10 +305,22 @@ export const TradeTimeTracker: React.FC = () => {
           {/* Current Status and Upcoming Events Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Enhanced Current Status Card with dynamic highlighting */}
-            <div className={`trading-card p-4 border-2 animate-border-pulse ${statusStyles.border} ${statusStyles.bg}`}>
+            <div 
+              className="trading-card p-4 border-2 animate-border-pulse"
+              style={{
+                backgroundColor: tradingStatus === 'green' ? 'hsl(var(--component-green) / 0.2)' :
+                               tradingStatus === 'yellow' ? 'hsl(var(--component-yellow) / 0.2)' :
+                               tradingStatus === 'red' ? 'hsl(var(--component-red) / 0.2)' :
+                               'hsl(var(--muted) / 0.1)',
+                borderColor: tradingStatus === 'green' ? 'hsl(var(--component-green) / 0.6)' :
+                           tradingStatus === 'yellow' ? 'hsl(var(--component-yellow) / 0.6)' :
+                           tradingStatus === 'red' ? 'hsl(var(--component-red) / 0.6)' :
+                           'hsl(var(--muted) / 0.3)'
+              }}
+            >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-blue-400 flex items-center space-x-2">
+                  <h2 className="text-base font-semibold text-component-blue flex items-center space-x-2">
                     <TrendingUp className="h-4 w-4" />
                     <span>Current Status</span>
                   </h2>
@@ -334,9 +346,9 @@ export const TradeTimeTracker: React.FC = () => {
                   
                   {/* Warning for urgent events */}
                   {countdownInfo.isUrgent && (
-                    <div className="flex items-center space-x-2 p-2.5 bg-red-500/10 border border-red-500/30 rounded-lg animate-pulse">
-                      <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
-                      <span className="text-xs text-red-400 font-medium">
+                    <div className="flex items-center space-x-2 p-2.5 bg-component-red/10 border border-component-red/30 rounded-lg animate-pulse">
+                      <AlertTriangle className="w-3.5 h-3.5 text-component-red" />
+                      <span className="text-xs text-component-red font-medium">
                         {activeEvents.length > 0 ? 'Event ending soon!' : 'Event starting soon!'}
                       </span>
                     </div>
@@ -346,13 +358,13 @@ export const TradeTimeTracker: React.FC = () => {
             </div>
 
             {/* Clean Upcoming Events Section - Right Side */}
-            <div className="trading-card p-4 trading-hover border border-blue-500/30 bg-blue-500/5">
+            <div className="trading-card p-4 trading-hover border border-component-blue/30 bg-component-blue/5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-semibold text-blue-400 flex items-center space-x-2">
+                <h2 className="text-base font-semibold text-component-blue flex items-center space-x-2">
                   <Timer className="h-4 w-4" />
                   <span>Upcoming Events</span>
                 </h2>
-                <div className="text-xs text-muted-foreground bg-blue-500/10 px-2 py-1 rounded-full">
+                <div className="text-xs text-muted-foreground bg-component-blue/10 px-2 py-1 rounded-full">
                   {upcomingEvents.length}
                 </div>
               </div>

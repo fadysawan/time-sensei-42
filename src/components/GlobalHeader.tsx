@@ -1,15 +1,32 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock, Settings, Globe, MapPin, Building2 } from 'lucide-react';
+import { Clock, Settings, Globe, MapPin, Building2, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TrafficLight } from './TrafficLight';
 import { useTradingStatus } from '../contexts/TradingStatusContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { useUserConfiguration } from '../contexts/UserConfigurationContext';
 
 export const GlobalHeader: React.FC = () => {
   const location = useLocation();
   const { currentTime, utcTime, newYorkTime, londonTime, tokyoTime, currentDate, utcDate, newYorkDate, londonDate, tokyoDate, tradingStatus, currentPeriod, nextEvent } = useTradingStatus();
+  const { theme, resolvedTheme } = useTheme();
+  const { updateDisplayPreferences } = useUserConfiguration();
   
   const isSettingsPage = location.pathname === '/settings';
+
+  // Theme toggle function
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    updateDisplayPreferences({ theme: nextTheme });
+  };
+
+  // Get theme icon
+  const getThemeIcon = () => {
+    return theme === 'dark' ? Sun : Moon;
+  };
+
+  const ThemeIcon = getThemeIcon();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/50 glass-effect shadow-lg">
@@ -89,6 +106,21 @@ export const GlobalHeader: React.FC = () => {
         
         <div className="flex items-center space-x-4">
           <TrafficLight status={tradingStatus} reason={currentPeriod} nextEvent={nextEvent} />
+          
+          {/* Theme Toggle Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleTheme}
+            className="trading-button border-border/50 hover:border-primary/50 hover:bg-primary/10"
+            title={`Current theme: ${theme}`}
+          >
+            <ThemeIcon className="h-4 w-4" />
+            <span className="hidden sm:inline ml-1">
+              {theme === 'light' ? 'Light' : 'Dark'}
+            </span>
+          </Button>
+          
           {isSettingsPage ? (
             <Button
               variant="default"

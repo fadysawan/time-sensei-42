@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserConfigurationProvider } from "./contexts/UserConfigurationContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { TradingDataProvider } from "./contexts/TradingDataContext";
 import { TradingStatusProvider } from "./contexts/TradingStatusContext";
 import { GlobalLayout } from "./components/GlobalLayout";
@@ -22,18 +23,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <UserConfigurationProvider>
-        <TradingDataProvider>
-          <BrowserRouter basename={basename}>
-            <GlobalLayout>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/settings" element={<Settings />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </GlobalLayout>
-          </BrowserRouter>
-        </TradingDataProvider>
+        <ThemeProvider>
+          <TradingDataProvider>
+            <BrowserRouter basename={basename}>
+              <GlobalLayout>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/settings" element={<Settings />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </GlobalLayout>
+            </BrowserRouter>
+          </TradingDataProvider>
+        </ThemeProvider>
       </UserConfigurationProvider>
     </TooltipProvider>
   </QueryClientProvider>

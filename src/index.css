@@ -6,6 +6,85 @@
 
 @layer base {
   :root {
+    /* Light theme (default) */
+    --background: 0 0% 100%;
+    --foreground: 220 23% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 23% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 23% 8%;
+
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 23% 8%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 14% 45%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 90%;
+    --input: 220 14% 96%;
+    --ring: 199 89% 48%;
+
+    /* Trading status colors - Financial market inspired */
+    --trading-bull: 142 76% 36%;          /* Strong green for bullish/active */
+    --trading-bull-light: 142 50% 45%;    /* Lighter green */
+    --trading-bear: 0 75% 55%;            /* Red for bearish/halt */
+    --trading-bear-light: 0 60% 60%;      /* Lighter red */
+    --trading-neutral: 45 96% 55%;        /* Amber for neutral/caution */
+    --trading-neutral-light: 45 85% 65%;  /* Lighter amber */
+    
+    /* Theme-aware component colors - Light theme */
+    --component-blue: 199 89% 35%;        /* Darker blue for light theme */
+    --component-purple: 270 95% 50%;      /* Darker purple for light theme */
+    --component-orange: 30 96% 45%;       /* Darker orange for light theme */
+    --component-yellow: 45 96% 40%;       /* Darker yellow for light theme */
+    --component-red: 0 75% 40%;           /* Darker red for light theme */
+    --component-green: 142 76% 25%;       /* Darker green for light theme */
+    --component-teal: 173 80% 40%;        /* Darker teal for light theme */
+    
+    /* Specific trading element colors */
+    --macro-color: 199 89% 48%;           /* Blue for macros */
+    --killzone-color: 270 95% 65%;        /* Purple for killzones */
+    --news-color: 30 96% 60%;             /* Orange for news */
+    --time-color: 199 89% 48%;            /* Blue for time displays */
+    
+    /* Chart and data colors */
+    --chart-grid: 220 23% 18%;
+    --chart-text: 220 14% 70%;
+    --data-positive: 142 76% 36%;
+    --data-negative: 0 75% 55%;
+    --data-neutral: 220 14% 65%;
+
+    /* Enhanced gradients for depth - Light theme */
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 14% 98%));
+    --gradient-trading: linear-gradient(135deg, hsl(var(--trading-bull)), hsl(142 50% 45%));
+    --gradient-caution: linear-gradient(135deg, hsl(var(--trading-neutral)), hsl(45 85% 65%));
+    --gradient-halt: linear-gradient(135deg, hsl(var(--trading-bear)), hsl(0 60% 60%));
+    --gradient-macro: linear-gradient(135deg, hsl(var(--macro-color)), hsl(199 70% 55%));
+    --gradient-killzone: linear-gradient(135deg, hsl(var(--killzone-color)), hsl(270 75% 70%));
+    --gradient-news: linear-gradient(135deg, hsl(var(--news-color)), hsl(30 80% 65%));
+
+    /* Professional shadows with color tints - Light theme */
+    --shadow-card: 0 8px 32px hsl(220 14% 4% / 0.1);
+    --shadow-trading: 0 4px 24px hsl(var(--trading-bull) / 0.25);
+    --shadow-caution: 0 4px 24px hsl(var(--trading-neutral) / 0.25);
+    --shadow-halt: 0 4px 24px hsl(var(--trading-bear) / 0.25);
+    --shadow-focus: 0 0 0 3px hsl(var(--ring) / 0.2);
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
     /* Dark trading terminal theme */
     --background: 220 23% 8%;
     --foreground: 210 40% 95%;
@@ -34,45 +113,21 @@
     --border: 220 23% 16%;
     --input: 220 23% 14%;
     --ring: 199 89% 48%;
-
-    /* Trading status colors - Financial market inspired */
-    --trading-bull: 142 76% 36%;          /* Strong green for bullish/active */
-    --trading-bull-light: 142 50% 45%;    /* Lighter green */
-    --trading-bear: 0 75% 55%;            /* Red for bearish/halt */
-    --trading-bear-light: 0 60% 60%;      /* Lighter red */
-    --trading-neutral: 45 96% 55%;        /* Amber for neutral/caution */
-    --trading-neutral-light: 45 85% 65%;  /* Lighter amber */
     
-    /* Specific trading element colors */
-    --macro-color: 199 89% 48%;           /* Blue for macros */
-    --killzone-color: 270 95% 65%;        /* Purple for killzones */
-    --news-color: 30 96% 60%;             /* Orange for news */
-    --time-color: 199 89% 48%;            /* Blue for time displays */
+    /* Theme-aware component colors for dark theme */
+    --component-blue: 199 89% 60%;        /* Brighter blue for dark theme */
+    --component-purple: 270 95% 75%;      /* Brighter purple for dark theme */
+    --component-orange: 30 96% 70%;       /* Brighter orange for dark theme */
+    --component-yellow: 45 96% 65%;       /* Brighter yellow for dark theme */
+    --component-red: 0 75% 65%;           /* Brighter red for dark theme */
+    --component-green: 142 76% 50%;       /* Brighter green for dark theme */
+    --component-teal: 173 80% 60%;        /* Brighter teal for dark theme */
     
-    /* Chart and data colors */
-    --chart-grid: 220 23% 18%;
-    --chart-text: 220 14% 70%;
-    --data-positive: 142 76% 36%;
-    --data-negative: 0 75% 55%;
-    --data-neutral: 220 14% 65%;
-
-    /* Enhanced gradients for depth */
+    /* Enhanced gradients for depth - Dark theme */
     --gradient-card: linear-gradient(145deg, hsl(220 23% 12%), hsl(220 23% 10%));
-    --gradient-trading: linear-gradient(135deg, hsl(var(--trading-bull)), hsl(142 50% 45%));
-    --gradient-caution: linear-gradient(135deg, hsl(var(--trading-neutral)), hsl(45 85% 65%));
-    --gradient-halt: linear-gradient(135deg, hsl(var(--trading-bear)), hsl(0 60% 60%));
-    --gradient-macro: linear-gradient(135deg, hsl(var(--macro-color)), hsl(199 70% 55%));
-    --gradient-killzone: linear-gradient(135deg, hsl(var(--killzone-color)), hsl(270 75% 70%));
-    --gradient-news: linear-gradient(135deg, hsl(var(--news-color)), hsl(30 80% 65%));
-
-    /* Professional shadows with color tints */
+    
+    /* Professional shadows with color tints - Dark theme */
     --shadow-card: 0 8px 32px hsl(220 23% 4% / 0.6);
-    --shadow-trading: 0 4px 24px hsl(var(--trading-bull) / 0.25);
-    --shadow-caution: 0 4px 24px hsl(var(--trading-neutral) / 0.25);
-    --shadow-halt: 0 4px 24px hsl(var(--trading-bear) / 0.25);
-    --shadow-focus: 0 0 0 3px hsl(var(--ring) / 0.2);
-
-    --radius: 0.5rem;
   }
 }
 
@@ -81,10 +136,24 @@
     @apply border-border;
   }
 
+  html {
+    /* Prevent flash by setting default background */
+    background: hsl(220 23% 8%);
+  }
+
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(135deg, hsl(220 23% 8%), hsl(220 23% 6%));
     min-height: 100vh;
+  }
+
+  /* Light theme background */
+  body:not(.dark) {
+    background: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 14% 98%));
+  }
+
+  /* Dark theme background */
+  body.dark {
+    background: linear-gradient(135deg, hsl(220 23% 8%), hsl(220 23% 6%));
   }
 }
 
@@ -112,45 +181,50 @@
   }
 
   .macro-accent {
-    @apply text-blue-400 bg-blue-500/10;
+    color: hsl(var(--component-blue));
+    background-color: hsl(var(--component-blue) / 0.1);
   }
 
   .killzone-accent {
-    @apply text-purple-400 bg-purple-500/10;
+    color: hsl(var(--component-purple));
+    background-color: hsl(var(--component-purple) / 0.1);
   }
 
   .news-accent {
-    @apply text-orange-400 bg-orange-500/10;
+    color: hsl(var(--component-orange));
+    background-color: hsl(var(--component-orange) / 0.1);
   }
 
   .countdown-urgent {
-    @apply text-red-400 font-bold;
-    text-shadow: 0 0 8px hsl(var(--trading-bear) / 0.6);
+    color: hsl(var(--component-red));
+    font-weight: bold;
+    text-shadow: 0 0 8px hsl(var(--component-red) / 0.6);
   }
 
   .countdown-soon {
-    @apply text-yellow-400 font-semibold;
-    text-shadow: 0 0 8px hsl(var(--trading-neutral) / 0.6);
+    color: hsl(var(--component-yellow));
+    font-weight: 600;
+    text-shadow: 0 0 8px hsl(var(--component-yellow) / 0.6);
   }
 
   .countdown-normal {
-    @apply text-blue-400;
+    color: hsl(var(--component-blue));
   }
 
   /* Timeline specific styles */
   .timeline-macro {
-    background: var(--gradient-macro);
-    box-shadow: 0 2px 8px hsl(var(--macro-color) / 0.3);
+    background: linear-gradient(135deg, hsl(var(--component-blue)), hsl(var(--component-blue) / 0.8));
+    box-shadow: 0 2px 8px hsl(var(--component-blue) / 0.3);
   }
 
   .timeline-killzone {
-    background: var(--gradient-killzone);
-    box-shadow: 0 2px 8px hsl(var(--killzone-color) / 0.3);
+    background: linear-gradient(135deg, hsl(var(--component-purple)), hsl(var(--component-purple) / 0.8));
+    box-shadow: 0 2px 8px hsl(var(--component-purple) / 0.3);
   }
 
   .timeline-news {
-    background: var(--gradient-news);
-    box-shadow: 0 2px 8px hsl(var(--news-color) / 0.3);
+    background: linear-gradient(135deg, hsl(var(--component-orange)), hsl(var(--component-orange) / 0.8));
+    box-shadow: 0 2px 8px hsl(var(--component-orange) / 0.3);
   }
 
   .timeline-inactive {
@@ -188,4 +262,95 @@
       box-shadow: 0 0 0 4px rgba(var(--border-rgb), 0);
     }
   }
+
+  /* Theme-aware component color utilities */
+  .text-component-blue { color: hsl(var(--component-blue)); }
+  .text-component-purple { color: hsl(var(--component-purple)); }
+  .text-component-orange { color: hsl(var(--component-orange)); }
+  .text-component-yellow { color: hsl(var(--component-yellow)); }
+  .text-component-red { color: hsl(var(--component-red)); }
+  .text-component-green { color: hsl(var(--component-green)); }
+  .text-component-teal { color: hsl(var(--component-teal)); }
+
+  .bg-component-blue { background-color: hsl(var(--component-blue)); }
+  .bg-component-purple { background-color: hsl(var(--component-purple)); }
+  .bg-component-orange { background-color: hsl(var(--component-orange)); }
+  .bg-component-yellow { background-color: hsl(var(--component-yellow)); }
+  .bg-component-red { background-color: hsl(var(--component-red)); }
+  .bg-component-green { background-color: hsl(var(--component-green)); }
+  .bg-component-teal { background-color: hsl(var(--component-teal)); }
+
+  .bg-component-blue\/10 { background-color: hsl(var(--component-blue) / 0.1); }
+  .bg-component-purple\/10 { background-color: hsl(var(--component-purple) / 0.1); }
+  .bg-component-orange\/10 { background-color: hsl(var(--component-orange) / 0.1); }
+  .bg-component-yellow\/10 { background-color: hsl(var(--component-yellow) / 0.1); }
+  .bg-component-red\/10 { background-color: hsl(var(--component-red) / 0.1); }
+  .bg-component-green\/10 { background-color: hsl(var(--component-green) / 0.1); }
+  .bg-component-teal\/10 { background-color: hsl(var(--component-teal) / 0.1); }
+
+  .bg-component-blue\/20 { background-color: hsl(var(--component-blue) / 0.2); }
+  .bg-component-purple\/20 { background-color: hsl(var(--component-purple) / 0.2); }
+  .bg-component-orange\/20 { background-color: hsl(var(--component-orange) / 0.2); }
+  .bg-component-yellow\/20 { background-color: hsl(var(--component-yellow) / 0.2); }
+  .bg-component-red\/20 { background-color: hsl(var(--component-red) / 0.2); }
+  .bg-component-green\/20 { background-color: hsl(var(--component-green) / 0.2); }
+  .bg-component-teal\/20 { background-color: hsl(var(--component-teal) / 0.2); }
+
+  .bg-component-blue\/5 { background-color: hsl(var(--component-blue) / 0.05); }
+  .bg-component-purple\/5 { background-color: hsl(var(--component-purple) / 0.05); }
+  .bg-component-orange\/5 { background-color: hsl(var(--component-orange) / 0.05); }
+  .bg-component-yellow\/5 { background-color: hsl(var(--component-yellow) / 0.05); }
+  .bg-component-red\/5 { background-color: hsl(var(--component-red) / 0.05); }
+  .bg-component-green\/5 { background-color: hsl(var(--component-green) / 0.05); }
+  .bg-component-teal\/5 { background-color: hsl(var(--component-teal) / 0.05); }
+
+  .border-component-blue { border-color: hsl(var(--component-blue)); }
+  .border-component-purple { border-color: hsl(var(--component-purple)); }
+  .border-component-orange { border-color: hsl(var(--component-orange)); }
+  .border-component-yellow { border-color: hsl(var(--component-yellow)); }
+  .border-component-red { border-color: hsl(var(--component-red)); }
+  .border-component-green { border-color: hsl(var(--component-green)); }
+  .border-component-teal { border-color: hsl(var(--component-teal)); }
+
+  .border-component-blue\/20 { border-color: hsl(var(--component-blue) / 0.2); }
+  .border-component-purple\/20 { border-color: hsl(var(--component-purple) / 0.2); }
+  .border-component-orange\/20 { border-color: hsl(var(--component-orange) / 0.2); }
+  .border-component-yellow\/20 { border-color: hsl(var(--component-yellow) / 0.2); }
+  .border-component-red\/20 { border-color: hsl(var(--component-red) / 0.2); }
+  .border-component-green\/20 { border-color: hsl(var(--component-green) / 0.2); }
+  .border-component-teal\/20 { border-color: hsl(var(--component-teal) / 0.2); }
+
+  .border-component-blue\/30 { border-color: hsl(var(--component-blue) / 0.3); }
+  .border-component-purple\/30 { border-color: hsl(var(--component-purple) / 0.3); }
+  .border-component-orange\/30 { border-color: hsl(var(--component-orange) / 0.3); }
+  .border-component-yellow\/30 { border-color: hsl(var(--component-yellow) / 0.3); }
+  .border-component-red\/30 { border-color: hsl(var(--component-red) / 0.3); }
+  .border-component-green\/30 { border-color: hsl(var(--component-green) / 0.3); }
+  .border-component-teal\/30 { border-color: hsl(var(--component-teal) / 0.3); }
+
+  .border-component-blue\/40 { border-color: hsl(var(--component-blue) / 0.4); }
+  .border-component-purple\/40 { border-color: hsl(var(--component-purple) / 0.4); }
+  .border-component-orange\/40 { border-color: hsl(var(--component-orange) / 0.4); }
+  .border-component-yellow\/40 { border-color: hsl(var(--component-yellow) / 0.4); }
+  .border-component-red\/40 { border-color: hsl(var(--component-red) / 0.4); }
+  .border-component-green\/40 { border-color: hsl(var(--component-green) / 0.4); }
+  .border-component-teal\/40 { border-color: hsl(var(--component-teal) / 0.4); }
+
+  /* Theme-aware status styles for better visibility */
+  .status-green-bg { background-color: hsl(var(--component-green) / 0.2); }
+  .status-yellow-bg { background-color: hsl(var(--component-yellow) / 0.2); }
+  .status-red-bg { background-color: hsl(var(--component-red) / 0.2); }
+
+  .status-green-border { border-color: hsl(var(--component-green) / 0.6); }
+  .status-yellow-border { border-color: hsl(var(--component-yellow) / 0.6); }
+  .status-red-border { border-color: hsl(var(--component-red) / 0.6); }
 }
+
+/* Dark theme overrides for status styles */
+.dark .status-green-bg { background-color: hsl(var(--component-green) / 0.05); }
+.dark .status-yellow-bg { background-color: hsl(var(--component-yellow) / 0.05); }
+.dark .status-red-bg { background-color: hsl(var(--component-red) / 0.05); }
+
+.dark .status-green-border { border-color: hsl(var(--component-green) / 0.3); }
+.dark .status-yellow-border { border-color: hsl(var(--component-yellow) / 0.3); }
+.dark .status-red-border { border-color: hsl(var(--component-red) / 0.3); }

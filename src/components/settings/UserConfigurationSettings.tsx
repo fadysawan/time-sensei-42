@@ -171,7 +171,7 @@ export const UserConfigurationSettings: React.FC<UserConfigurationSettingsProps>
                 <Label className="text-sm font-medium">Theme</Label>
                 <Select
                   value={config.displayPreferences.theme}
-                  onValueChange={(value: 'light' | 'dark' | 'auto') => 
+                  onValueChange={(value: 'light' | 'dark') => 
                     onDisplayPreferencesChange({ theme: value })
                   }
                 >
@@ -179,7 +179,6 @@ export const UserConfigurationSettings: React.FC<UserConfigurationSettingsProps>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="auto">Auto (System)</SelectItem>
                     <SelectItem value="light">Light</SelectItem>
                     <SelectItem value="dark">Dark</SelectItem>
                   </SelectContent>

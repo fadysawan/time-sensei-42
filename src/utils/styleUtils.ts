@@ -5,51 +5,59 @@ export const getEventTypeStyles = (eventType: EventType): EventTypeStyles => {
   switch (eventType) {
     case 'macro':
       return {
-        bg: 'bg-blue-500/10',
-        border: 'border-blue-500/30',
-        text: 'text-blue-400',
-        dot: 'bg-blue-400',
-        badge: 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+        bg: 'bg-component-blue/10',
+        border: 'border-component-blue/30',
+        text: 'text-component-blue',
+        dot: 'bg-component-blue',
+        badge: 'bg-component-blue/20 text-component-blue border border-component-blue/40'
       };
     case 'killzone':
       return {
-        bg: 'bg-purple-500/10',
-        border: 'border-purple-500/30',
-        text: 'text-purple-400',
-        dot: 'bg-purple-400',
-        badge: 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+        bg: 'bg-component-purple/10',
+        border: 'border-component-purple/30',
+        text: 'text-component-purple',
+        dot: 'bg-component-purple',
+        badge: 'bg-component-purple/20 text-component-purple border border-component-purple/40'
       };
     case 'news':
       return {
-        bg: 'bg-orange-500/10',
-        border: 'border-orange-500/30',
-        text: 'text-orange-400',
-        dot: 'bg-orange-400',
-        badge: 'bg-orange-500/20 text-orange-300 border border-orange-500/40'
+        bg: 'bg-component-orange/10',
+        border: 'border-component-orange/30',
+        text: 'text-component-orange',
+        dot: 'bg-component-orange',
+        badge: 'bg-component-orange/20 text-component-orange border border-component-orange/40'
       };
     case 'premarket':
       return {
-        bg: 'bg-yellow-500/10',
-        border: 'border-yellow-500/30',
-        text: 'text-yellow-400',
-        dot: 'bg-yellow-400',
-        badge: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40'
+        bg: 'bg-component-yellow/10',
+        border: 'border-component-yellow/30',
+        text: 'text-component-yellow',
+        dot: 'bg-component-yellow',
+        badge: 'bg-component-yellow/20 text-component-yellow border border-component-yellow/40'
       };
     case 'lunch':
       return {
-        bg: 'bg-red-500/10',
-        border: 'border-red-500/30',
-        text: 'text-red-400',
-        dot: 'bg-red-400',
-        badge: 'bg-red-500/20 text-red-300 border border-red-500/40'
+        bg: 'bg-component-red/10',
+        border: 'border-component-red/30',
+        text: 'text-component-red',
+        dot: 'bg-component-red',
+        badge: 'bg-component-red/20 text-component-red border border-component-red/40'
+      };
+    case 'custom':
+      return {
+        bg: 'bg-component-teal/10',
+        border: 'border-component-teal/30',
+        text: 'text-component-teal',
+        dot: 'bg-component-teal',
+        badge: 'bg-component-teal/20 text-component-teal border border-component-teal/40'
       };
     default:
       return {
-        bg: 'bg-gray-500/10',
-        border: 'border-gray-500/30',
-        text: 'text-gray-400',
-        dot: 'bg-gray-400',
-        badge: 'bg-gray-500/20 text-gray-300 border border-gray-500/40'
+        bg: 'bg-muted/10',
+        border: 'border-muted/30',
+        text: 'text-muted-foreground',
+        dot: 'bg-muted-foreground',
+        badge: 'bg-muted/20 text-muted-foreground border border-muted/40'
       };
   }
 };
@@ -58,27 +66,27 @@ export const getStatusStyles = (status: TradingStatus): StatusStyles => {
   switch (status) {
     case 'green':
       return {
-        border: 'border-green-500/30',
-        bg: 'bg-green-500/5',
-        gradient: 'from-green-500 to-emerald-600'
+        border: 'status-green-border',
+        bg: 'status-green-bg',
+        gradient: 'from-component-green to-component-green'
       };
     case 'yellow':
       return {
-        border: 'border-yellow-500/30',
-        bg: 'bg-yellow-500/5',
-        gradient: 'from-yellow-500 to-orange-600'
+        border: 'status-yellow-border',
+        bg: 'status-yellow-bg',
+        gradient: 'from-component-yellow to-component-yellow'
       };
     case 'red':
       return {
-        border: 'border-red-500/30',
-        bg: 'bg-red-500/5',
-        gradient: 'from-red-500 to-pink-600'
+        border: 'status-red-border',
+        bg: 'status-red-bg',
+        gradient: 'from-component-red to-component-red'
       };
     default:
       return {
-        border: 'border-gray-500/30',
-        bg: 'bg-gray-500/5',
-        gradient: 'from-gray-500 to-slate-600'
+        border: 'border-muted/30',
+        bg: 'bg-muted/5',
+        gradient: 'from-muted to-muted'
       };
   }
 };

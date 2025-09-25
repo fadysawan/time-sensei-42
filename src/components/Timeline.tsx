@@ -70,7 +70,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
                 <div className="text-xs text-muted-foreground/70 mt-1">
                   Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
                 </div>
-                <div className="text-xs text-purple-400 mt-1">
+                <div className="text-xs text-component-purple mt-1">
                   High Probability Zone
                 </div>
                 
@@ -113,7 +113,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
                 <div className="text-xs text-muted-foreground/70 mt-1">
                   Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
                 </div>
-                <div className="text-xs text-purple-400 mt-1">
+                <div className="text-xs text-component-purple mt-1">
                   High Probability Zone
                 </div>
                 
@@ -185,15 +185,15 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
       case 'killzone':
         return 'timeline-killzone';
       case 'premarket':
-        return 'bg-yellow-400';
+        return 'bg-component-yellow';
       case 'market-open':
-        return 'bg-green-500';
+        return 'bg-component-green';
       case 'lunch':
-        return 'bg-red-400';
+        return 'bg-component-red';
       case 'after-hours':
-        return 'bg-blue-400';
+        return 'bg-component-blue';
       case 'custom':
-        return 'bg-purple-500';
+        return 'bg-component-teal';
       case 'news':
         return 'timeline-news';
       default:
@@ -227,7 +227,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-blue-400">Trading Timeline</h2>
+        <h2 className="text-lg font-semibold text-component-blue">Trading Timeline</h2>
       </div>
       
       {/* Timeline Container with enhanced styling */}
@@ -246,39 +246,56 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
           {/* Track labels sidebar */}
           <div className="absolute -left-20 top-0 space-y-3 w-16">
             <div className="h-8 flex items-center justify-end">
-              <span className="text-xs font-medium text-purple-400">Killzones</span>
+            <span className="text-xs font-medium text-component-purple">Killzones</span>
+          </div>
+          <div className="h-8 flex items-center justify-end">
+            <span className="text-xs font-medium text-component-blue">Macros</span>
+          </div>
+          <div className="h-8 flex items-center justify-end">
+            <span className="text-xs font-medium text-component-orange">News</span>
             </div>
             <div className="h-8 flex items-center justify-end">
-              <span className="text-xs font-medium text-blue-400">Macros</span>
-            </div>
-            <div className="h-8 flex items-center justify-end">
-              <span className="text-xs font-medium text-orange-400">News</span>
-            </div>
-            <div className="h-8 flex items-center justify-end">
-              <span className="text-xs font-medium text-yellow-400">Sessions</span>
+              <span className="text-xs font-medium text-component-yellow">Sessions</span>
             </div>
           </div>
           {/* Current time marker - positioned to use the space above timeline */}
           <div
-            className="absolute -top-12 bottom-0 w-0.5 bg-gradient-to-b from-blue-400 to-blue-600 z-40 pointer-events-none"
-            style={{ left: `${currentPosition}%` }}
+            className="absolute -top-12 bottom-0 w-0.5 z-50 pointer-events-none"
+            style={{ 
+              left: `${currentPosition}%`,
+              background: 'linear-gradient(to bottom, hsl(var(--component-blue)), hsl(var(--component-blue)))'
+            }}
           >
             {/* Time indicator dot */}
-            <div className="absolute top-8 left-1/2 transform -translate-x-1/2 
-                           w-4 h-4 bg-blue-400 rounded-full border-2 border-background shadow-lg
-                           ring-2 ring-blue-400/30"></div>
+            <div 
+              className="absolute top-8 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full border-2 shadow-lg"
+              style={{
+                backgroundColor: 'hsl(var(--component-blue))',
+                borderColor: 'hsl(var(--background))',
+                boxShadow: '0 0 0 2px hsl(var(--component-blue) / 0.3)'
+              }}
+            ></div>
             
             {/* Time display label - positioned in the space above */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 
-                           px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-lg
-                           whitespace-nowrap shadow-xl font-medium border border-blue-400/30">
+            <div 
+              className="absolute top-0 left-1/2 transform -translate-x-1/2 px-3 py-1.5 text-white text-xs rounded-lg whitespace-nowrap shadow-xl font-medium"
+              style={{
+                background: 'linear-gradient(to right, hsl(var(--component-blue)), hsl(var(--component-blue)))',
+                border: '1px solid hsl(var(--component-blue) / 0.3)'
+              }}
+            >
               <div className="flex items-center space-x-1">
                 <div className="w-1.5 h-1.5 bg-white rounded-full opacity-75"></div>
                 <span>{currentTime}</span>
               </div>
               {/* Elegant arrow pointer */}
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-0.5
-                             w-2 h-2 bg-blue-500 rotate-45 border-r border-b border-blue-400/30"></div>
+              <div 
+                className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-0.5 w-2 h-2 rotate-45 border-r border-b"
+                style={{
+                  backgroundColor: 'hsl(var(--component-blue))',
+                  borderColor: 'hsl(var(--component-blue) / 0.3)'
+                }}
+              ></div>
             </div>
           </div>
           {/* Killzones track */}

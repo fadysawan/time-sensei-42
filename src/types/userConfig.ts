@@ -4,7 +4,7 @@ export interface UserConfiguration {
   displayPreferences: {
     showSeconds: boolean;
     showCountdown: boolean;
-    theme: 'light' | 'dark' | 'auto';
+    theme: 'light' | 'dark';
     notifications: {
       enabled: boolean;
       sound: boolean;
@@ -24,7 +24,7 @@ export const defaultUserConfiguration: UserConfiguration = {
   displayPreferences: {
     showSeconds: false,
     showCountdown: true,
-    theme: 'auto',
+    theme: 'dark',
     notifications: {
       enabled: true,
       sound: true,
