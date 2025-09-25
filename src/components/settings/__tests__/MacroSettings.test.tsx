@@ -30,7 +30,7 @@ jest.mock('@/components/ui/button', () => ({
 }));
 
 jest.mock('@/components/ui/input', () => ({
-  Input: ({ value, onChange, placeholder }: { value: string; onChange: (e: any) => void; placeholder?: string }) => (
+  Input: ({ value, onChange, placeholder }: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder?: string }) => (
     <input data-testid="input" value={value} onChange={onChange} placeholder={placeholder} />
   ),
 }));
@@ -50,7 +50,7 @@ jest.mock('@/components/ui/select', () => ({
 }));
 
 jest.mock('@/components/ui/timezone-aware-time-picker', () => ({
-  TimezoneAwareTimePicker: ({ label, utcTime, onTimeChange }: { label: string; utcTime: any; onTimeChange: (time: any) => void }) => (
+  TimezoneAwareTimePicker: ({ label, utcTime, onTimeChange }: { label: string; utcTime: TimeRange; onTimeChange: (time: TimeRange) => void }) => (
     <div data-testid="timezone-aware-time-picker">
       <label>{label}</label>
       <input 
@@ -66,7 +66,7 @@ jest.mock('@/components/ui/timezone-aware-time-picker', () => ({
 }));
 
 jest.mock('@/components/ui/timezone-aware-time-interval-picker', () => ({
-  TimezoneAwareTimeIntervalPicker: ({ label, startTime, endTime, onStartTimeChange, onEndTimeChange }: any) => (
+  TimezoneAwareTimeIntervalPicker: ({ label, startTime, endTime, onStartTimeChange, onEndTimeChange }: { label: string; startTime: TimeRange; endTime: TimeRange; onStartTimeChange: (time: TimeRange) => void; onEndTimeChange: (time: TimeRange) => void }) => (
     <div data-testid="timezone-aware-time-interval-picker">
       <label>{label}</label>
       <input 

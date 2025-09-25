@@ -17,7 +17,7 @@ export const useStatusNotifications = (currentStatus: TradingStatus, currentPeri
     const initAudio = () => {
       if (!audioContextRef.current) {
         try {
-          audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+          audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
           // Resume context if it's suspended
           if (audioContextRef.current.state === 'suspended') {
             audioContextRef.current.resume();

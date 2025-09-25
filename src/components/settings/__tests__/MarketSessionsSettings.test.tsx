@@ -14,7 +14,7 @@ jest.mock('@/components/ui/button', () => ({
 }));
 
 jest.mock('@/components/ui/input', () => ({
-  Input: ({ value, onChange, placeholder, id }: { value: string; onChange: (e: any) => void; placeholder?: string; id?: string }) => (
+  Input: ({ value, onChange, placeholder, id }: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder?: string; id?: string }) => (
     <input data-testid="input" id={id} value={value} onChange={onChange} placeholder={placeholder} />
   ),
 }));
@@ -57,7 +57,7 @@ jest.mock('@/components/ui/collapsible', () => ({
 }));
 
 jest.mock('@/components/ui/timezone-aware-time-picker', () => ({
-  TimezoneAwareTimePicker: ({ label, utcTime, onTimeChange }: { label: string; utcTime: any; onTimeChange: (time: any) => void }) => (
+  TimezoneAwareTimePicker: ({ label, utcTime, onTimeChange }: { label: string; utcTime: TimeRange; onTimeChange: (time: TimeRange) => void }) => (
     <div data-testid="timezone-aware-time-picker">
       <label>{label}</label>
       <input 

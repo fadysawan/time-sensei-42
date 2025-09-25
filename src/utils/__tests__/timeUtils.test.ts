@@ -58,5 +58,5 @@ export const testTimezoneConversion = () => {
 
 // Export for use in development
 if (typeof window !== 'undefined') {
-  (window as any).testTimezoneConversion = testTimezoneConversion;
+  (window as typeof window & { testTimezoneConversion?: typeof testTimezoneConversion }).testTimezoneConversion = testTimezoneConversion;
 }

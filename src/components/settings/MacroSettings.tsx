@@ -80,7 +80,7 @@ export const MacroSettings: React.FC<MacroSettingsProps> = ({
     onParametersChange(updatedParams);
   };
 
-  const updateMacro = (macroId: string, field: keyof MacroSession, value: any) => {
+  const updateMacro = (macroId: string, field: keyof MacroSession, value: string | TimeRange | 'High' | 'Low' | undefined) => {
     const newMacros = [...parameters.macros];
     const index = newMacros.findIndex(m => m.id === macroId);
     

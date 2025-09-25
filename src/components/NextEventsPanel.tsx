@@ -173,7 +173,7 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
   const [futureNewsEvents, setFutureNewsEvents] = useState<NextEvent[]>([]);
 
   // Get next occurrence after the immediate next event
-  const getNextAfter = (currentEvent: NextEvent | null, events: any[], timeField: string = 'start'): NextEvent | null => {
+  const getNextAfter = (currentEvent: NextEvent | null, events: (MacroSession | KillzoneSession | NewsInstance)[], timeField: string = 'start'): NextEvent | null => {
     if (!currentEvent) return null;
     
     const currentEventTime = currentEvent.timeUntilMinutes;
@@ -196,7 +196,7 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
   };
 
   // Get future events of specific type
-  const getFutureEventsOfType = (currentEvent: NextEvent | null, events: any[], timeField: string = 'start'): NextEvent[] => {
+  const getFutureEventsOfType = (currentEvent: NextEvent | null, events: (MacroSession | KillzoneSession | NewsInstance)[], timeField: string = 'start'): NextEvent[] => {
     if (!currentEvent) return [];
     
     const currentEventTime = currentEvent.timeUntilMinutes;

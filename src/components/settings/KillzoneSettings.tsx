@@ -73,7 +73,7 @@ export const KillzoneSettings: React.FC<KillzoneSettingsProps> = ({
     onParametersChange(updatedParams);
   };
 
-  const updateKillzone = (killzoneId: string, field: keyof KillzoneSession, value: any) => {
+  const updateKillzone = (killzoneId: string, field: keyof KillzoneSession, value: string | TimeRange) => {
     const newKillzones = [...parameters.killzones];
     const index = newKillzones.findIndex(k => k.id === killzoneId);
     

@@ -66,5 +66,5 @@ export const testTimezoneFixes = () => {
 
 // Export for use in development
 if (typeof window !== 'undefined') {
-  (window as any).testTimezoneFixes = testTimezoneFixes;
+  (window as typeof window & { testTimezoneFixes?: typeof testTimezoneFixes }).testTimezoneFixes = testTimezoneFixes;
 }

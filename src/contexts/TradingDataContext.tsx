@@ -7,8 +7,8 @@ import { KillzoneSession } from '../models';
 const TRADING_DATA_STORAGE_KEY = 'tradingData';
 
 // Migration function to convert old structures to new array formats
-const migrateTradingData = (oldData: any): TradingData => {
-  let migratedData = { ...oldData };
+const migrateTradingData = (oldData: Record<string, unknown>): TradingData => {
+  const migratedData = { ...oldData };
 
   // Migrate old killzones format (object with london/newYork properties)
   if (migratedData.killzones && !Array.isArray(migratedData.killzones)) {

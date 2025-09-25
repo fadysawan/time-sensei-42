@@ -60,7 +60,7 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
     newsInstances: parameters.newsInstances,
     userTimezone: parameters.userTimezone,
     // Add timestamp to force updates (if _timestamp exists in parameters)
-    _timestamp: (parameters as any)._timestamp || 0
+    _timestamp: (parameters as TradingParameters & { _timestamp?: number })._timestamp || 0
   });
   
   console.log('🔍 TradingStatusProvider: checking parameters change', {
@@ -282,7 +282,7 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
     setNewYorkDate(formatDateForDisplay('America/New_York'));
     setLondonDate(formatDateForDisplay('Europe/London'));
     setTokyoDate(formatDateForDisplay('Asia/Tokyo'));
-  }, [parameters, config.displayPreferences.showSeconds]);
+  }, [parameters, config.displayPreferences.showSeconds, tradingStatus]);
 
   // Log when updateTime callback is recreated due to dependencies changing
   useEffect(() => {

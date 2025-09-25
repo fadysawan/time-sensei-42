@@ -330,7 +330,7 @@ export const formatCountdownSmart = (hours: number, minutes: number, seconds?: n
 
 // Time calculation utilities
 export const formatDuration = (startHours: number, startMinutes: number, endHours: number, endMinutes: number): string => {
-  let startTotalMinutes = startHours * 60 + startMinutes;
+  const startTotalMinutes = startHours * 60 + startMinutes;
   let endTotalMinutes = endHours * 60 + endMinutes;
   
   // Handle overnight periods
@@ -354,7 +354,7 @@ export const formatDuration = (startHours: number, startMinutes: number, endHour
 // Check if time is within range
 export const isTimeInRange = (currentHours: number, currentMinutes: number, startHours: number, startMinutes: number, endHours: number, endMinutes: number): boolean => {
   const currentTotalMinutes = currentHours * 60 + currentMinutes;
-  let startTotalMinutes = startHours * 60 + startMinutes;
+  const startTotalMinutes = startHours * 60 + startMinutes;
   let endTotalMinutes = endHours * 60 + endMinutes;
   
   // Handle overnight periods
