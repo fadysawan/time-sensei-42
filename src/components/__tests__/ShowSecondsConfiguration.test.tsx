@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { TradeTimeTracker } from '../TradeTimeTracker';
 import { NextEventsPanel } from '../NextEventsPanel';
+import { useUserConfiguration } from '../../contexts/UserConfigurationContext';
+import { formatCountdownSmart, formatCountdownDetailed } from '../../utils/timeUtils';
 
 // Mock the contexts
 jest.mock('../../contexts/TradingStatusContext', () => ({
@@ -123,7 +125,6 @@ describe('Show Seconds Configuration', () => {
     render(<TradeTimeTracker />);
 
     await waitFor(() => {
-      const { formatCountdownSmart } = require('../../utils/timeUtils');
       expect(formatCountdownSmart).toHaveBeenCalledWith(0, 3, 0, true, 3);
     });
   });
@@ -143,7 +144,6 @@ describe('Show Seconds Configuration', () => {
     render(<TradeTimeTracker />);
 
     await waitFor(() => {
-      const { formatCountdownSmart } = require('../../utils/timeUtils');
       expect(formatCountdownSmart).toHaveBeenCalledWith(0, 3, 0, false, 3);
     });
   });
@@ -172,7 +172,6 @@ describe('Show Seconds Configuration', () => {
     render(<NextEventsPanel parameters={mockParameters} />);
 
     await waitFor(() => {
-      const { formatCountdownDetailed } = require('../../utils/timeUtils');
       expect(formatCountdownDetailed).toHaveBeenCalledWith(3, true);
     });
   });
@@ -201,7 +200,6 @@ describe('Show Seconds Configuration', () => {
     render(<NextEventsPanel parameters={mockParameters} />);
 
     await waitFor(() => {
-      const { formatCountdownDetailed } = require('../../utils/timeUtils');
       expect(formatCountdownDetailed).toHaveBeenCalledWith(3, false);
     });
   });

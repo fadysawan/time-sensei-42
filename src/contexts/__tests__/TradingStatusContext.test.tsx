@@ -3,6 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { TradingStatusProvider, useTradingStatus } from '../TradingStatusContext';
 import { TradingParameters } from '../../models';
 import { UserConfiguration } from '../../types/userConfig';
+import { formatTimeSmart } from '../../utils/timeUtils';
 
 // Mock the trading logic functions
 jest.mock('../../utils/tradingLogic', () => ({
@@ -114,7 +115,6 @@ describe('TradingStatusContext ShowSeconds Configuration', () => {
   });
 
   it('should show seconds in time displays when showSeconds is enabled', async () => {
-    const { formatTimeSmart } = require('../../utils/timeUtils');
     
     render(
       <TradingStatusProvider parameters={mockParameters} config={mockConfigWithSeconds}>
@@ -136,7 +136,6 @@ describe('TradingStatusContext ShowSeconds Configuration', () => {
   });
 
   it('should not show seconds in time displays when showSeconds is disabled', async () => {
-    const { formatTimeSmart } = require('../../utils/timeUtils');
     
     render(
       <TradingStatusProvider parameters={mockParameters} config={mockConfigWithoutSeconds}>
@@ -158,7 +157,6 @@ describe('TradingStatusContext ShowSeconds Configuration', () => {
   });
 
   it('should update time displays when showSeconds configuration changes', async () => {
-    const { formatTimeSmart } = require('../../utils/timeUtils');
     
     const { rerender } = render(
       <TradingStatusProvider parameters={mockParameters} config={mockConfigWithoutSeconds}>
@@ -189,7 +187,6 @@ describe('TradingStatusContext ShowSeconds Configuration', () => {
   });
 
   it('should show seconds for all timezone displays when enabled', async () => {
-    const { formatTimeSmart } = require('../../utils/timeUtils');
     
     render(
       <TradingStatusProvider parameters={mockParameters} config={mockConfigWithSeconds}>
@@ -208,7 +205,6 @@ describe('TradingStatusContext ShowSeconds Configuration', () => {
   });
 
   it('should not show seconds for any timezone displays when disabled', async () => {
-    const { formatTimeSmart } = require('../../utils/timeUtils');
     
     render(
       <TradingStatusProvider parameters={mockParameters} config={mockConfigWithoutSeconds}>
@@ -227,10 +223,9 @@ describe('TradingStatusContext ShowSeconds Configuration', () => {
   });
 
   it('should handle countdown-based seconds display correctly', async () => {
-    const { formatTimeSmart } = require('../../utils/timeUtils');
     
     // Mock countdown below 5 minutes to trigger automatic seconds display
-    const { getTradingStatus } = require('../../utils/tradingLogic');
+    const { getTradingStatus } = jest.requireMock('../../utils/tradingLogic');
     getTradingStatus.mockReturnValue({
       status: 'green',
       period: 'Active Trading',
@@ -252,7 +247,6 @@ describe('TradingStatusContext ShowSeconds Configuration', () => {
   });
 
   it('should update time displays when parameters change', async () => {
-    const { formatTimeSmart } = require('../../utils/timeUtils');
     
     const { rerender } = render(
       <TradingStatusProvider parameters={mockParameters} config={mockConfigWithSeconds}>
