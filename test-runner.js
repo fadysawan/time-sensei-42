@@ -227,6 +227,7 @@ function validateGherkinScenarios() {
     const optionalProbabilityFeature = readFileSync(join(__dirname, 'features/optional-probability.feature'), 'utf8');
     const unitTestsFeature = readFileSync(join(__dirname, 'features/unit-tests.feature'), 'utf8');
     const timezoneConversionFeature = readFileSync(join(__dirname, 'features/timezone-conversion.feature'), 'utf8');
+    const showSecondsConfigurationFeature = readFileSync(join(__dirname, 'features/show-seconds-configuration.feature'), 'utf8');
     
     test('Optional Probability Gherkin file exists and is valid', () => {
       expect(optionalProbabilityFeature).toContain('Feature: Optional Probability for Trading Sessions');
@@ -252,6 +253,14 @@ function validateGherkinScenarios() {
       expect(timezoneConversionFeature).toContain('Then');
     });
     
+    test('ShowSeconds Configuration Gherkin file exists and is valid', () => {
+      expect(showSecondsConfigurationFeature).toContain('Feature: Show Seconds Configuration');
+      expect(showSecondsConfigurationFeature).toContain('Scenario:');
+      expect(showSecondsConfigurationFeature).toContain('Given');
+      expect(showSecondsConfigurationFeature).toContain('When');
+      expect(showSecondsConfigurationFeature).toContain('Then');
+    });
+    
     test('Gherkin files cover all major functionality', () => {
       expect(optionalProbabilityFeature).toContain('MacroSession');
       expect(optionalProbabilityFeature).toContain('MarketSession');
@@ -269,6 +278,11 @@ function validateGherkinScenarios() {
       expect(timezoneConversionFeature).toContain('NextEventsPanel');
       expect(timezoneConversionFeature).toContain('TradeTimeTracker');
       expect(timezoneConversionFeature).toContain('Intl.DateTimeFormat');
+      
+      expect(showSecondsConfigurationFeature).toContain('showSeconds');
+      expect(showSecondsConfigurationFeature).toContain('TradingStatusContext');
+      expect(showSecondsConfigurationFeature).toContain('formatTimeSmart');
+      expect(showSecondsConfigurationFeature).toContain('countdown');
     });
     
     console.log('✅ Gherkin scenarios are properly documented');

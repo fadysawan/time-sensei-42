@@ -33,6 +33,17 @@ This file documents the timezone conversion and display functionality. It covers
 - Performance and reliability considerations
 - Cross-browser compatibility
 
+### `show-seconds-configuration.feature`
+This file documents the showSeconds configuration functionality. It covers:
+- User control over seconds display in time counters and clocks
+- Configuration persistence and change detection
+- Automatic seconds display for urgent countdowns
+- Integration with all timezone displays
+- Timeline time indicator behavior
+- Countdown component integration
+- Edge cases and performance considerations
+- Comprehensive unit test coverage
+
 ## How to Use These Files
 
 ### For Developers
