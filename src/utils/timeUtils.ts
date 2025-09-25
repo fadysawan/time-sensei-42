@@ -207,14 +207,25 @@ export const convertUTCToUserTimezone = (utcHours: number, utcMinutes: number, u
     const today = new Date();
     const utcDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), utcHours, utcMinutes, 0));
     
-    // Convert to user's timezone
-    const userTime = new Date(utcDate.toLocaleString("en-US", {timeZone: userTimezone}));
+    // Convert to user's timezone using Intl.DateTimeFormat for better reliability
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: userTimezone,
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    
+    const parts = formatter.formatToParts(utcDate);
+    const hours = parseInt(parts.find(part => part.type === 'hour')?.value || '0');
+    const minutes = parseInt(parts.find(part => part.type === 'minute')?.value || '0');
+    const seconds = parseInt(parts.find(part => part.type === 'second')?.value || '0');
     
     return {
-      hours: userTime.getHours(),
-      minutes: userTime.getMinutes(),
-      seconds: userTime.getSeconds(),
-      formatted: `${userTime.getHours().toString().padStart(2, '0')}:${userTime.getMinutes().toString().padStart(2, '0')}:${userTime.getSeconds().toString().padStart(2, '0')}`
+      hours,
+      minutes,
+      seconds,
+      formatted: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
     };
   } catch (error) {
     console.warn('Error converting UTC to user timezone:', error);
