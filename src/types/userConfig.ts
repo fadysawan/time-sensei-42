@@ -17,6 +17,22 @@ export interface UserConfiguration {
     autoRefresh: boolean;
     refreshInterval: number; // in seconds
   };
+  timezoneDisplay: {
+    enabled: boolean;
+    displayMode: 'header' | 'hover' | 'both' | 'hidden';
+    headerTimezones: {
+      utc: boolean;
+      tokyo: boolean;
+      london: boolean;
+      newYork: boolean;
+    };
+    hoverTimezones: {
+      utc: boolean;
+      tokyo: boolean;
+      london: boolean;
+      newYork: boolean;
+    };
+  };
 }
 
 export const defaultUserConfiguration: UserConfiguration = {
@@ -36,5 +52,21 @@ export const defaultUserConfiguration: UserConfiguration = {
     showTooltips: true,
     autoRefresh: true,
     refreshInterval: 1, // 1 second
+  },
+  timezoneDisplay: {
+    enabled: true,
+    displayMode: 'hover',
+    headerTimezones: {
+      utc: true,
+      tokyo: false,
+      london: true,
+      newYork: false,
+    },
+    hoverTimezones: {
+      utc: true,
+      tokyo: true,
+      london: true,
+      newYork: true,
+    },
   },
 };

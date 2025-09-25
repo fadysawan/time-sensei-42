@@ -10,6 +10,7 @@ interface UserConfigurationContextType {
   updateTimezone: (timezone: string) => void;
   updateDisplayPreferences: (displayPreferences: Partial<UserConfiguration['displayPreferences']>) => void;
   updateUIPreferences: (uiPreferences: Partial<UserConfiguration['uiPreferences']>) => void;
+  updateTimezoneDisplay: (timezoneDisplay: Partial<UserConfiguration['timezoneDisplay']>) => void;
   resetConfiguration: () => void;
 }
 
@@ -51,6 +52,18 @@ export const UserConfigurationProvider: React.FC<UserConfigurationProviderProps>
             uiPreferences: {
               ...defaultUserConfiguration.uiPreferences,
               ...parsed.uiPreferences,
+            },
+            timezoneDisplay: {
+              ...defaultUserConfiguration.timezoneDisplay,
+              ...parsed.timezoneDisplay,
+              headerTimezones: {
+                ...defaultUserConfiguration.timezoneDisplay.headerTimezones,
+                ...parsed.timezoneDisplay?.headerTimezones,
+              },
+              hoverTimezones: {
+                ...defaultUserConfiguration.timezoneDisplay.hoverTimezones,
+                ...parsed.timezoneDisplay?.hoverTimezones,
+              },
             },
           };
           
@@ -112,6 +125,16 @@ export const UserConfigurationProvider: React.FC<UserConfigurationProviderProps>
     });
   };
 
+  const updateTimezoneDisplay = (timezoneDisplay: Partial<UserConfiguration['timezoneDisplay']>) => {
+    updateConfiguration({
+      ...config,
+      timezoneDisplay: {
+        ...config.timezoneDisplay,
+        ...timezoneDisplay,
+      },
+    });
+  };
+
   const resetConfiguration = () => {
     const detectedTimezone = getUserTimezone();
     const resetConfig = {
@@ -134,6 +157,7 @@ export const UserConfigurationProvider: React.FC<UserConfigurationProviderProps>
     updateTimezone,
     updateDisplayPreferences,
     updateUIPreferences,
+    updateTimezoneDisplay,
     resetConfiguration,
   };
 

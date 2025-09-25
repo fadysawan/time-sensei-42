@@ -12,7 +12,7 @@ const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'config' | 'trading'>('trading');
 
   // Use separated hooks for better control
-  const { config: userConfig, updateConfiguration, updateTimezone, updateDisplayPreferences, updateUIPreferences } = useUserConfiguration();
+  const { config: userConfig, updateConfiguration, updateTimezone, updateDisplayPreferences, updateUIPreferences, updateTimezoneDisplay } = useUserConfiguration();
   const { tradingData, updateTradingData, updateMacros, updateKillzones, updateMarketSessions, updateNewsTemplates, updateNewsInstances, resetTradingData } = useTradingData();
   
   // Create combined parameters for backward compatibility
@@ -140,6 +140,7 @@ const Settings: React.FC = () => {
                   onTimezoneChange={updateTimezone}
                   onDisplayPreferencesChange={updateDisplayPreferences}
                   onUIPreferencesChange={updateUIPreferences}
+                  onTimezoneDisplayChange={updateTimezoneDisplay}
                 />
               </div>
             </div>

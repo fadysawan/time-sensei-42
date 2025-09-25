@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { TimezoneSelector } from '../TimezoneSelector';
 import { UserConfiguration } from '../../types/userConfig';
-import { Settings, Globe, Bell, Monitor, Palette, Volume2, TestTube } from 'lucide-react';
+import { Settings, Globe, Bell, Monitor, Palette, Volume2, TestTube, Clock } from 'lucide-react';
 import { useStatusNotifications } from '../../hooks/useStatusNotifications';
 import { toast } from 'sonner';
 
@@ -16,6 +16,7 @@ interface UserConfigurationSettingsProps {
   onTimezoneChange: (timezone: string) => void;
   onDisplayPreferencesChange: (preferences: Partial<UserConfiguration['displayPreferences']>) => void;
   onUIPreferencesChange: (preferences: Partial<UserConfiguration['uiPreferences']>) => void;
+  onTimezoneDisplayChange: (timezoneDisplay: Partial<UserConfiguration['timezoneDisplay']>) => void;
 }
 
 export const UserConfigurationSettings: React.FC<UserConfigurationSettingsProps> = ({
@@ -24,6 +25,7 @@ export const UserConfigurationSettings: React.FC<UserConfigurationSettingsProps>
   onTimezoneChange,
   onDisplayPreferencesChange,
   onUIPreferencesChange,
+  onTimezoneDisplayChange,
 }) => {
   const [activeTab, setActiveTab] = useState<'timezone' | 'display' | 'notifications' | 'interface'>('timezone');
   
@@ -183,6 +185,216 @@ export const UserConfigurationSettings: React.FC<UserConfigurationSettingsProps>
                     <SelectItem value="dark">Dark</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Timezone Display Configuration */}
+              <div className="pt-6 border-t border-border/50">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-blue-400" />
+                    <Label className="text-sm font-medium">Header Clock Display</Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Configure which timezones to display in the header and how they appear.
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-medium">Enable Header Clocks</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Show world clocks in the header area
+                      </p>
+                    </div>
+                    <Switch
+                      checked={config.timezoneDisplay.enabled}
+                      onCheckedChange={(checked) => 
+                        onTimezoneDisplayChange({ enabled: checked })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Display Mode</Label>
+                    <Select
+                      value={config.timezoneDisplay.displayMode}
+                      onValueChange={(value: 'header' | 'hover' | 'both' | 'hidden') => 
+                        onTimezoneDisplayChange({ displayMode: value })
+                      }
+                      disabled={!config.timezoneDisplay.enabled}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="hidden">Hide timezone clocks</SelectItem>
+                        <SelectItem value="hover">Show on hover only</SelectItem>
+                        <SelectItem value="header">Show in header</SelectItem>
+                        <SelectItem value="both">Show both in header and on hover</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Choose how the world clocks are displayed in the header
+                    </p>
+                  </div>
+
+                  {/* Header Timezones Selection */}
+                  {config.timezoneDisplay.displayMode === 'header' || config.timezoneDisplay.displayMode === 'both' ? (
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Header Timezones</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Select which timezones to display directly in the header
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Globe className="h-3 w-3 text-green-400" />
+                            <span className="text-xs">UTC</span>
+                          </div>
+                          <Switch
+                            checked={config.timezoneDisplay.headerTimezones.utc}
+                            onCheckedChange={(checked) => 
+                              onTimezoneDisplayChange({
+                                headerTimezones: { ...config.timezoneDisplay.headerTimezones, utc: checked }
+                              })
+                            }
+                            disabled={!config.timezoneDisplay.enabled}
+                            size="sm"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Globe className="h-3 w-3 text-red-400" />
+                            <span className="text-xs">Tokyo (JST)</span>
+                          </div>
+                          <Switch
+                            checked={config.timezoneDisplay.headerTimezones.tokyo}
+                            onCheckedChange={(checked) => 
+                              onTimezoneDisplayChange({
+                                headerTimezones: { ...config.timezoneDisplay.headerTimezones, tokyo: checked }
+                              })
+                            }
+                            disabled={!config.timezoneDisplay.enabled}
+                            size="sm"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Globe className="h-3 w-3 text-orange-400" />
+                            <span className="text-xs">London (GMT/BST)</span>
+                          </div>
+                          <Switch
+                            checked={config.timezoneDisplay.headerTimezones.london}
+                            onCheckedChange={(checked) => 
+                              onTimezoneDisplayChange({
+                                headerTimezones: { ...config.timezoneDisplay.headerTimezones, london: checked }
+                              })
+                            }
+                            disabled={!config.timezoneDisplay.enabled}
+                            size="sm"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Globe className="h-3 w-3 text-purple-400" />
+                            <span className="text-xs">New York (EST/EDT)</span>
+                          </div>
+                          <Switch
+                            checked={config.timezoneDisplay.headerTimezones.newYork}
+                            onCheckedChange={(checked) => 
+                              onTimezoneDisplayChange({
+                                headerTimezones: { ...config.timezoneDisplay.headerTimezones, newYork: checked }
+                              })
+                            }
+                            disabled={!config.timezoneDisplay.enabled}
+                            size="sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {/* Hover Timezones Selection */}
+                  {config.timezoneDisplay.displayMode === 'hover' || config.timezoneDisplay.displayMode === 'both' ? (
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Hover Timezones</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Select which timezones to display in the hover tooltip
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Globe className="h-3 w-3 text-green-400" />
+                            <span className="text-xs">UTC</span>
+                          </div>
+                          <Switch
+                            checked={config.timezoneDisplay.hoverTimezones.utc}
+                            onCheckedChange={(checked) => 
+                              onTimezoneDisplayChange({
+                                hoverTimezones: { ...config.timezoneDisplay.hoverTimezones, utc: checked }
+                              })
+                            }
+                            disabled={!config.timezoneDisplay.enabled}
+                            size="sm"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Globe className="h-3 w-3 text-red-400" />
+                            <span className="text-xs">Tokyo (JST)</span>
+                          </div>
+                          <Switch
+                            checked={config.timezoneDisplay.hoverTimezones.tokyo}
+                            onCheckedChange={(checked) => 
+                              onTimezoneDisplayChange({
+                                hoverTimezones: { ...config.timezoneDisplay.hoverTimezones, tokyo: checked }
+                              })
+                            }
+                            disabled={!config.timezoneDisplay.enabled}
+                            size="sm"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Globe className="h-3 w-3 text-orange-400" />
+                            <span className="text-xs">London (GMT/BST)</span>
+                          </div>
+                          <Switch
+                            checked={config.timezoneDisplay.hoverTimezones.london}
+                            onCheckedChange={(checked) => 
+                              onTimezoneDisplayChange({
+                                hoverTimezones: { ...config.timezoneDisplay.hoverTimezones, london: checked }
+                              })
+                            }
+                            disabled={!config.timezoneDisplay.enabled}
+                            size="sm"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Globe className="h-3 w-3 text-purple-400" />
+                            <span className="text-xs">New York (EST/EDT)</span>
+                          </div>
+                          <Switch
+                            checked={config.timezoneDisplay.hoverTimezones.newYork}
+                            onCheckedChange={(checked) => 
+                              onTimezoneDisplayChange({
+                                hoverTimezones: { ...config.timezoneDisplay.hoverTimezones, newYork: checked }
+                              })
+                            }
+                            disabled={!config.timezoneDisplay.enabled}
+                            size="sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </CardContent>
           </Card>

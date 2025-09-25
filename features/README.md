@@ -166,3 +166,27 @@ Regularly review test coverage to ensure:
 - Use scenarios for communication between teams
 - Reference scenarios in code comments
 - Include scenarios in project documentation
+
+## Feature Files Overview
+
+### Core Features
+- **unit-tests.feature**: Comprehensive test coverage for all application functionality
+- **optional-probability.feature**: Optional probability fields for macros and market sessions
+- **timezone-conversion.feature**: Timezone handling and conversion functionality
+- **showseconds-configuration.feature**: Show seconds display configuration
+- **timezone-display-configuration.feature**: Header timezone display configuration
+
+### Feature Descriptions
+
+#### Timezone Display Configuration
+The timezone display configuration feature allows users to customize which world clocks are shown in the header and how they are displayed. This includes:
+
+- **Enable/Disable**: Toggle header clocks on/off
+- **Display Modes**: Choose between hover-only, header-only, or both
+- **Timezone Selection**: Select which specific timezones to display (UTC, Tokyo, London, New York)
+- **Real-time Updates**: Clocks update automatically and respect user's showSeconds setting
+- **Responsive Design**: Adapts to different screen sizes
+- **Theme Integration**: Works with both light and dark themes
+- **Persistence**: Settings are saved and restored across sessions
+
+This feature enhances the user experience by providing flexible timezone information display options while maintaining performance and usability.

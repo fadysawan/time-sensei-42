@@ -254,6 +254,21 @@ Feature: Unit Tests for Trading Session Management
     And the tests should verify countdown-based automatic seconds display
     And all showSeconds configuration tests should pass
 
+  Scenario: Timezone Display Configuration Tests
+    Given I have timezone display configuration functionality
+    When I run the timezone display tests
+    Then the tests should verify UserConfigurationContext timezone display handling
+    And the tests should verify UserConfigurationSettings timezone display tab
+    And the tests should verify GlobalHeader timezone display rendering
+    And the tests should verify timezone display state management
+    And the tests should verify timezone display persistence
+    And the tests should verify timezone display mode switching
+    And the tests should verify individual timezone toggling
+    And the tests should verify disabled state handling
+    And the tests should verify responsive timezone display
+    And the tests should verify timezone display integration with other settings
+    And all timezone display configuration tests should pass
+
   Scenario: Test Documentation and Readability
     Given I have unit tests for the application
     When I review the test code
