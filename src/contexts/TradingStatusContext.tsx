@@ -282,7 +282,7 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
     setNewYorkDate(formatDateForDisplay('America/New_York'));
     setLondonDate(formatDateForDisplay('Europe/London'));
     setTokyoDate(formatDateForDisplay('Asia/Tokyo'));
-  }, [parameters, config.displayPreferences.showSeconds, tradingStatus]);
+  }, [parameters, config.displayPreferences, tradingStatus]);
 
   // Log when updateTime callback is recreated due to dependencies changing
   useEffect(() => {
@@ -291,7 +291,7 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
       killzonesCount: parameters.killzones.length,
       timestamp: new Date().toISOString()
     });
-  }, [parameters, config.displayPreferences.showSeconds]);
+  }, [parameters, config.displayPreferences]);
 
   // Function to refresh status immediately
   const refreshStatus = useCallback(() => {
