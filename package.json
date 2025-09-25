@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "node test-runner.js",
-    "test:watch": "node test-runner.js --watch"
+    "test:ci": "node test-runner.js && echo 'All tests passed successfully'",
+    "test:watch": "node test-runner.js --watch",
+    "test:coverage": "node test-runner.js --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

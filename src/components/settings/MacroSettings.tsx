@@ -81,7 +81,6 @@ export const MacroSettings: React.FC<MacroSettingsProps> = ({
   };
 
   const updateMacro = (macroId: string, field: keyof MacroSession, value: any) => {
-    console.log('🔧 Updating macro:', { macroId, field, value, currentMacros: parameters.macros });
     const newMacros = [...parameters.macros];
     const index = newMacros.findIndex(m => m.id === macroId);
     
@@ -90,15 +89,12 @@ export const MacroSettings: React.FC<MacroSettingsProps> = ({
       return;
     }
     
-    console.log('📍 Found macro at index:', index, 'Old value:', newMacros[index][field]);
     newMacros[index] = { ...newMacros[index], [field]: value };
-    console.log('📝 Updated macro:', newMacros[index]);
     
     const updatedParams = {
       ...parameters,
       macros: newMacros
     };
-    console.log('📤 Sending updated params:', updatedParams);
     onParametersChange(updatedParams);
   };
 
@@ -307,7 +303,6 @@ export const MacroSettings: React.FC<MacroSettingsProps> = ({
                             utcTime={macro.start}
                             userTimezone={parameters.userTimezone}
                             onTimeChange={(time) => {
-                              console.log('🕐 TimePicker start time changed:', time, 'for macro:', macro.id);
                               updateMacro(macro.id, 'start', time);
                             }}
                             showTimezoneInfo={false}
@@ -317,7 +312,6 @@ export const MacroSettings: React.FC<MacroSettingsProps> = ({
                             utcTime={macro.end}
                             userTimezone={parameters.userTimezone}
                             onTimeChange={(time) => {
-                              console.log('🕐 TimePicker end time changed:', time, 'for macro:', macro.id);
                               updateMacro(macro.id, 'end', time);
                             }}
                             showTimezoneInfo={false}
