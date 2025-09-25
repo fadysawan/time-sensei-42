@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import { MarketSession, TimeRange } from '../../utils/tradingLogic';
+import { convertUTCToUserTimezone, formatTime, getTimezoneAbbreviation, calculateDuration } from '../../utils/timeUtils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { TimePicker } from '@/components/ui/time-picker';
+import { TimezoneAwareTimePicker } from '@/components/ui/timezone-aware-time-picker';
 import { Plus, Trash2, Clock, Eye, EyeOff, ChevronDown, ChevronRight } from 'lucide-react';
 
-interface MarketSessionsManagerProps {
+interface MarketSessionsSettingsProps {
   marketSessions: MarketSession[];
   onSessionsChange: (sessions: MarketSession[]) => void;
+  userTimezone: string;
 }
 
-export const MarketSessionsManager: React.FC<MarketSessionsManagerProps> = ({
+export const MarketSessionsSettings: React.FC<MarketSessionsSettingsProps> = ({
   marketSessions,
-  onSessionsChange
+  onSessionsChange,
+  userTimezone
 }) => {
   const [newSessionName, setNewSessionName] = useState('');
   const [newSessionType, setNewSessionType] = useState<'custom'>('custom');
@@ -156,20 +159,20 @@ export const MarketSessionsManager: React.FC<MarketSessionsManagerProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Start Time</Label>
-              <TimePicker
-                value={newSessionStart}
-                onChange={setNewSessionStart}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>End Time</Label>
-              <TimePicker
-                value={newSessionEnd}
-                onChange={setNewSessionEnd}
-              />
-            </div>
+            <TimezoneAwareTimePicker
+              label="Start Time"
+              utcTime={newSessionStart}
+              userTimezone={userTimezone}
+              onTimeChange={setNewSessionStart}
+              showTimezoneInfo={false}
+            />
+            <TimezoneAwareTimePicker
+              label="End Time"
+              utcTime={newSessionEnd}
+              userTimezone={userTimezone}
+              onTimeChange={setNewSessionEnd}
+              showTimezoneInfo={false}
+            />
           </div>
 
           <Button 
@@ -199,43 +202,59 @@ export const MarketSessionsManager: React.FC<MarketSessionsManagerProps> = ({
                 open={expandedSessions.has(session.id)}
                 onOpenChange={() => toggleSessionExpand(session.id)}
               >
-                <div className={`border rounded-lg transition-all duration-200 ${
-                  session.isActive ? 'border-border' : 'border-border/30 opacity-60'
+                <div className={`border rounded-xl transition-all duration-200 shadow-sm hover:shadow-md ${
+                  session.isActive 
+                    ? 'border-border/60 bg-card hover:bg-card/80' 
+                    : 'border-border/30 bg-muted/20 opacity-70 hover:opacity-90'
                 }`}>
-                  <CollapsibleTrigger className="w-full p-4 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="w-full p-5 hover:bg-muted/30 transition-all duration-200 rounded-xl">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        {expandedSessions.has(session.id) ? 
-                          <ChevronDown className="h-4 w-4" /> : 
-                          <ChevronRight className="h-4 w-4" />
-                        }
+                      <div className="flex items-center space-x-3">
                         <div className="flex items-center space-x-2">
-                          {session.isActive ? (
-                            <Eye className="h-4 w-4 text-green-400" />
-                          ) : (
-                            <EyeOff className="h-4 w-4 text-muted-foreground" />
-                          )}
-                          <span className="font-medium text-left">{session.name}</span>
-                          <span className={`text-xs px-2 py-1 rounded-full border ${getSessionTypeColor(session.type)}`}>
-                            {session.type.toUpperCase()}
-                          </span>
+                          {expandedSessions.has(session.id) ? 
+                            <ChevronDown className="h-4 w-4 text-blue-400" /> : 
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          }
+                          <div className="flex items-center space-x-3">
+                            {session.isActive ? (
+                              <div className="p-1.5 rounded-full bg-green-500/20">
+                                <Eye className="h-3.5 w-3.5 text-green-400" />
+                              </div>
+                            ) : (
+                              <div className="p-1.5 rounded-full bg-muted/50">
+                                <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="flex items-center space-x-2">
+                              <span className="font-semibold text-foreground">{session.name}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${getSessionTypeColor(session.type)}`}>
+                                {session.type.toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm text-muted-foreground">
-                          {session.start.hours.toString().padStart(2, '0')}:{session.start.minutes.toString().padStart(2, '0')} - {session.end.hours.toString().padStart(2, '0')}:{session.end.minutes.toString().padStart(2, '0')}
-                        </span>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-foreground">
+                            {(() => {
+                              const startTime = convertUTCToUserTimezone(session.start.hours, session.start.minutes, userTimezone);
+                              const endTime = convertUTCToUserTimezone(session.end.hours, session.end.minutes, userTimezone);
+                              return `${formatTime(startTime.hours, startTime.minutes)} - ${formatTime(endTime.hours, endTime.minutes)}`;
+                            })()} <span className="text-xs text-muted-foreground ml-1">{getTimezoneAbbreviation(userTimezone)}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="p-4 border-t space-y-4">
-                    <div className="flex items-center justify-between mb-3">
+                  <CollapsibleContent className="p-5 border-t bg-muted/20 space-y-5">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <Switch
                           checked={session.isActive}
                           onCheckedChange={() => handleToggleActive(session.id)}
                         />
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm font-medium">
                           {session.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </div>
@@ -253,42 +272,43 @@ export const MarketSessionsManager: React.FC<MarketSessionsManagerProps> = ({
                       </Button>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div>
-                        <Label htmlFor={`session-name-${session.id}`} className="text-xs text-muted-foreground">
+                        <Label htmlFor={`session-name-${session.id}`} className="text-sm font-medium mb-2 block">
                           Session Name
                         </Label>
                         <Input
                           id={`session-name-${session.id}`}
                           value={session.name}
                           onChange={(e) => handleSessionNameChange(session.id, e.target.value)}
-                          className="mt-1"
                           disabled={['premarket', 'market-open', 'lunch', 'after-hours'].includes(session.type)}
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label className="text-xs text-muted-foreground">Start Time</Label>
-                          <TimePicker
-                            value={session.start}
-                            onChange={(time) => handleSessionTimeChange(session.id, 'start', time)}
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-muted-foreground">End Time</Label>
-                          <TimePicker
-                            value={session.end}
-                            onChange={(time) => handleSessionTimeChange(session.id, 'end', time)}
-                          />
-                        </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <TimezoneAwareTimePicker
+                          label="Start Time"
+                          utcTime={session.start}
+                          userTimezone={userTimezone}
+                          onTimeChange={(time) => handleSessionTimeChange(session.id, 'start', time)}
+                          showTimezoneInfo={false}
+                        />
+                        <TimezoneAwareTimePicker
+                          label="End Time"
+                          utcTime={session.end}
+                          userTimezone={userTimezone}
+                          onTimeChange={(time) => handleSessionTimeChange(session.id, 'end', time)}
+                          showTimezoneInfo={false}
+                        />
                       </div>
 
-                      <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
-                        Duration: {Math.abs(
-                          (session.end.hours * 60 + session.end.minutes) - 
-                          (session.start.hours * 60 + session.start.minutes)
-                        )} minutes
+                      <div className="text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                        {(() => {
+                          const durationMinutes = calculateDuration(session.start, session.end);
+                          const hours = Math.floor(durationMinutes / 60);
+                          const minutes = durationMinutes % 60;
+                          return `Duration: ${hours}h ${minutes}m (${durationMinutes} minutes)`;
+                        })()}
                       </div>
                     </div>
                   </CollapsibleContent>

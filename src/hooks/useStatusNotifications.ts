@@ -140,6 +140,12 @@ export const useStatusNotifications = (currentStatus: TradingStatus, currentPeri
 
   // Monitor status changes
   useEffect(() => {
+    console.log('🔍 useStatusNotifications: checking status change', {
+      previousStatus: previousStatus.current,
+      currentStatus,
+      hasChanged: previousStatus.current !== null && previousStatus.current !== currentStatus
+    });
+    
     if (previousStatus.current !== null && previousStatus.current !== currentStatus) {
       const statusChange: StatusChange = {
         from: previousStatus.current,

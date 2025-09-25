@@ -7,8 +7,41 @@ export const APP_CONFIG = {
 } as const;
 
 export const TIMEZONES = {
+  UTC: 'UTC',
   BEIRUT: 'Asia/Beirut',
   NEW_YORK: 'America/New_York',
+  LONDON: 'Europe/London',
+  TOKYO: 'Asia/Tokyo',
+  SYDNEY: 'Australia/Sydney',
+  FRANKFURT: 'Europe/Berlin',
+  PARIS: 'Europe/Paris',
+  DUBAI: 'Asia/Dubai',
+  SINGAPORE: 'Asia/Singapore',
+  HONG_KONG: 'Asia/Hong_Kong',
+  LOS_ANGELES: 'America/Los_Angeles',
+  CHICAGO: 'America/Chicago',
+  TORONTO: 'America/Toronto',
+  SAO_PAULO: 'America/Sao_Paulo',
+  MOSCOW: 'Europe/Moscow',
+  ISTANBUL: 'Europe/Istanbul',
+  JOHANNESBURG: 'Africa/Johannesburg',
+  MUMBAI: 'Asia/Kolkata',
+  SHANGHAI: 'Asia/Shanghai',
+  SEOUL: 'Asia/Seoul',
+  MELBOURNE: 'Australia/Melbourne',
+} as const;
+
+// Common trading timezones
+export const TRADING_TIMEZONES = {
+  UTC: 'UTC',
+  LONDON: 'Europe/London',
+  NEW_YORK: 'America/New_York',
+  TOKYO: 'Asia/Tokyo',
+  SYDNEY: 'Australia/Sydney',
+  FRANKFURT: 'Europe/Berlin',
+  DUBAI: 'Asia/Dubai',
+  SINGAPORE: 'Asia/Singapore',
+  HONG_KONG: 'Asia/Hong_Kong',
 } as const;
 
 export const EVENT_COLORS = {

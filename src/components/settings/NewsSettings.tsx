@@ -11,19 +11,22 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { NewsTemplate, NewsInstance, NewsImpact } from '../../models';
 import { NewsService } from '../../services';
+import { getTimezoneAbbreviation } from '../../utils/timeUtils';
 
 interface NewsSettingsProps {
   newsTemplates: NewsTemplate[];
   newsInstances: NewsInstance[];
-  onUpdateNewsTemplates: (templates: NewsTemplate[]) => void;
-  onUpdateNewsInstances: (instances: NewsInstance[]) => void;
+  userTimezone: string;
+  onTemplatesChange: (templates: NewsTemplate[]) => void;
+  onInstancesChange: (instances: NewsInstance[]) => void;
 }
 
 export const NewsSettings: React.FC<NewsSettingsProps> = ({
   newsTemplates,
   newsInstances,
-  onUpdateNewsTemplates,
-  onUpdateNewsInstances
+  userTimezone,
+  onTemplatesChange,
+  onInstancesChange
 }) => {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [instanceForm, setInstanceForm] = useState({
@@ -65,7 +68,7 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
       return;
     }
 
-    onUpdateNewsInstances([...newsInstances, newInstance]);
+    onInstancesChange([...newsInstances, newInstance]);
     
     // Reset form
     setInstanceForm({
@@ -77,11 +80,11 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
   };
 
   const handleDeleteInstance = (instanceId: string) => {
-    onUpdateNewsInstances(newsInstances.filter(i => i.id !== instanceId));
+    onInstancesChange(newsInstances.filter(i => i.id !== instanceId));
   };
 
   const handleToggleInstance = (instanceId: string) => {
-    onUpdateNewsInstances(
+    onInstancesChange(
       newsInstances.map(instance => 
         instance.id === instanceId 
           ? { ...instance, isActive: !instance.isActive }
@@ -125,7 +128,7 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
       description: templateForm.description.trim()
     };
 
-    onUpdateNewsTemplates([...newsTemplates, newTemplate]);
+    onTemplatesChange([...newsTemplates, newTemplate]);
     setIsCreatingTemplate(false);
     resetTemplateForm();
   };
@@ -164,7 +167,7 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
             }
           : template
       );
-      onUpdateNewsTemplates(updatedTemplates);
+      onTemplatesChange(updatedTemplates);
     } else {
       // Converting default template to user template
       const updatedTemplate: NewsTemplate = {
@@ -176,7 +179,7 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
         impact: templateForm.impact,
         description: templateForm.description.trim()
       };
-      onUpdateNewsTemplates([...newsTemplates, updatedTemplate]);
+      onTemplatesChange([...newsTemplates, updatedTemplate]);
     }
 
     setEditingTemplate(null);
@@ -202,11 +205,11 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
     }
 
     // Delete user-created template
-    onUpdateNewsTemplates(newsTemplates.filter(t => t.id !== templateId));
+    onTemplatesChange(newsTemplates.filter(t => t.id !== templateId));
     
     // Clean up instances using this template
     if (usedInInstances) {
-      onUpdateNewsInstances(newsInstances.filter(instance => instance.templateId !== templateId));
+      onInstancesChange(newsInstances.filter(instance => instance.templateId !== templateId));
     }
   };
 
@@ -312,15 +315,19 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Scheduled Time</Label>
+                    <Label className="flex items-center space-x-2">
+                      <span>Scheduled Time</span>
+                      <span className="text-xs text-muted-foreground">({getTimezoneAbbreviation(userTimezone)})</span>
+                    </Label>
                     <Input
                       type="datetime-local"
                       value={instanceForm.datetime}
                       onChange={(e) => setInstanceForm(prev => ({ ...prev, datetime: e.target.value }))}
                       min={getCurrentDateTime()}
                     />
-                    <div className="text-xs text-muted-foreground">
-                      Impact level is locked to template setting: {availableTemplates.find(t => t.id === selectedTemplate)?.impact}
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <div>Impact level is locked to template setting: {availableTemplates.find(t => t.id === selectedTemplate)?.impact}</div>
+                      <div>Times are displayed in your selected timezone but stored in UTC</div>
                     </div>
                   </div>
 

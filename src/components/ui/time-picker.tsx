@@ -25,13 +25,14 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   useEffect(() => {
     setTempHours(value.hours);
     setTempMinutes(value.minutes);
-  }, [value]);
+  }, [value.hours, value.minutes]);
 
   const formatTime = (hours: number, minutes: number) => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
   const handleApply = () => {
+    // Always call onChange to ensure the time is updated
     onChange({ hours: tempHours, minutes: tempMinutes });
     setIsOpen(false);
   };

@@ -48,6 +48,7 @@ export interface TradingParameters {
   marketSessions: MarketSession[];
   newsTemplates: NewsTemplate[];
   newsInstances: NewsInstance[];
+  userTimezone: string; // User's preferred timezone for display
 }
 
 export const defaultTradingParameters: TradingParameters = {
@@ -55,57 +56,57 @@ export const defaultTradingParameters: TradingParameters = {
     {
       id: 'london-1',
       name: 'London Session 1',
-      start: { hours: 9, minutes: 33 },
-      end: { hours: 10, minutes: 0 },
+      start: { hours: 7, minutes: 33 }, // UTC: 7:33 (was 9:33 Beirut time)
+      end: { hours: 8, minutes: 0 },    // UTC: 8:00 (was 10:00 Beirut time)
       region: 'London'
     },
     {
       id: 'london-2', 
       name: 'London Session 2',
-      start: { hours: 11, minutes: 3 },
-      end: { hours: 11, minutes: 30 },
+      start: { hours: 9, minutes: 3 },  // UTC: 9:03 (was 11:03 Beirut time)
+      end: { hours: 9, minutes: 30 },   // UTC: 9:30 (was 11:30 Beirut time)
       region: 'London'
     },
     {
       id: 'ny-am-1',
       name: 'NY AM 1',
-      start: { hours: 15, minutes: 50 },
-      end: { hours: 16, minutes: 10 },
+      start: { hours: 13, minutes: 50 }, // UTC: 13:50 (was 15:50 Beirut time)
+      end: { hours: 14, minutes: 10 },   // UTC: 14:10 (was 16:10 Beirut time)
       region: 'New York'
     },
     {
       id: 'ny-am-2',
       name: 'NY AM 2', 
-      start: { hours: 16, minutes: 50 },
-      end: { hours: 17, minutes: 10 },
+      start: { hours: 14, minutes: 50 }, // UTC: 14:50 (was 16:50 Beirut time)
+      end: { hours: 15, minutes: 10 },   // UTC: 15:10 (was 17:10 Beirut time)
       region: 'New York'
     },
     {
       id: 'ny-am-3',
       name: 'NY AM 3',
-      start: { hours: 17, minutes: 50 },
-      end: { hours: 18, minutes: 10 },
+      start: { hours: 15, minutes: 50 }, // UTC: 15:50 (was 17:50 Beirut time)
+      end: { hours: 16, minutes: 10 },   // UTC: 16:10 (was 18:10 Beirut time)
       region: 'New York'
     },
     {
       id: 'ny-midday',
       name: 'NY Midday',
-      start: { hours: 18, minutes: 50 },
-      end: { hours: 19, minutes: 10 },
+      start: { hours: 16, minutes: 50 }, // UTC: 16:50 (was 18:50 Beirut time)
+      end: { hours: 17, minutes: 10 },   // UTC: 17:10 (was 19:10 Beirut time)
       region: 'New York'
     },
     {
       id: 'ny-pm',
       name: 'NY PM',
-      start: { hours: 20, minutes: 10 },
-      end: { hours: 20, minutes: 40 },
+      start: { hours: 18, minutes: 10 }, // UTC: 18:10 (was 20:10 Beirut time)
+      end: { hours: 18, minutes: 40 },   // UTC: 18:40 (was 20:40 Beirut time)
       region: 'New York'
     },
     {
       id: 'ny-closing',
       name: 'NY Closing',
-      start: { hours: 22, minutes: 15 },
-      end: { hours: 22, minutes: 45 },
+      start: { hours: 20, minutes: 15 }, // UTC: 20:15 (was 22:15 Beirut time)
+      end: { hours: 20, minutes: 45 },   // UTC: 20:45 (was 22:45 Beirut time)
       region: 'New York'
     }
   ],
@@ -113,15 +114,15 @@ export const defaultTradingParameters: TradingParameters = {
     {
       id: 'london-kz',
       name: 'London KZ',
-      start: { hours: 6, minutes: 0 },
-      end: { hours: 9, minutes: 0 },
+      start: { hours: 4, minutes: 0 },   // UTC: 4:00 (temporary for testing)
+      end: { hours: 7, minutes: 0 },     // UTC: 7:00 (temporary for testing)
       region: 'London'
     },
     {
       id: 'newyork-kz',
       name: 'New York KZ',
-      start: { hours: 14, minutes: 30 },
-      end: { hours: 17, minutes: 30 },
+      start: { hours: 12, minutes: 30 }, // UTC: 12:30 (was 14:30 Beirut time)
+      end: { hours: 15, minutes: 30 },   // UTC: 15:30 (was 17:30 Beirut time)
       region: 'New York'
     }
   ],
@@ -129,22 +130,31 @@ export const defaultTradingParameters: TradingParameters = {
     {
       id: 'premarket',
       name: 'Pre-Market',
-      start: { hours: 7, minutes: 0 },
-      end: { hours: 9, minutes: 30 },
+      start: { hours: 5, minutes: 0 },   // UTC: 5:00 (was 7:00 Beirut time)
+      end: { hours: 7, minutes: 30 },    // UTC: 7:30 (was 9:30 Beirut time)
       type: 'premarket',
       isActive: true
     },
     {
       id: 'lunch',
       name: 'Lunch Break',
-      start: { hours: 19, minutes: 0 },
-      end: { hours: 20, minutes: 0 },
+      start: { hours: 17, minutes: 0 },  // UTC: 17:00 (was 19:00 Beirut time)
+      end: { hours: 18, minutes: 0 },    // UTC: 18:00 (was 20:00 Beirut time)
       type: 'lunch',
+      isActive: true
+    },
+    {
+      id: 'custom-test',
+      name: 'Custom Trading Session',
+      start: { hours: 8, minutes: 0 },   // UTC: 8:00 (was 10:00 Beirut time)
+      end: { hours: 10, minutes: 0 },    // UTC: 10:00 (was 12:00 Beirut time)
+      type: 'custom',
       isActive: true
     }
   ],
   newsTemplates: NewsService.getDefaultNewsTemplates(),
-  newsInstances: []
+  newsInstances: [],
+  userTimezone: 'UTC' // Will be updated to user's detected timezone on first load
 };
 
 export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] => {
@@ -216,17 +226,32 @@ export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] =
   });
 };
 
+// Helper function to check if current time is within a time range (handles overnight ranges)
+export const isTimeInRange = (currentTime: number, startTime: number, endTime: number): boolean => {
+  // Handle overnight ranges (e.g., 22:00 to 06:00)
+  if (startTime > endTime) {
+    // Overnight range: current time should be >= startTime OR < endTime
+    // Note: Using < instead of <= so that endTime is exclusive
+    return currentTime >= startTime || currentTime < endTime;
+  } else {
+    // Normal range: current time should be >= startTime AND < endTime
+    // Note: Using < instead of <= so that endTime is exclusive
+    return currentTime >= startTime && currentTime < endTime;
+  }
+};
+
 export const getTradingStatus = (
   currentHour: number,
   currentMinute: number,
   parameters: TradingParameters
 ): { status: TradingStatus; period: string; nextEvent: string } => {
+  // All times are now in UTC internally
   const currentTime = currentHour * 60 + currentMinute;
   const blocks = generateTimeBlocks(parameters);
   
-  // Create current date with the provided time for news checking
+  // Create current date with the provided UTC time for news checking
   const now = new Date();
-  const currentDateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), currentHour, currentMinute);
+  const currentDateTime = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), currentHour, currentMinute));
   
   // PRIORITY 1: Check if we're in news countdown or cooldown period - RED LIGHT
   // Check active news instances manually to avoid circular dependency
@@ -283,7 +308,7 @@ export const getTradingStatus = (
   const currentKillzone = parameters.killzones.find(killzone => {
     const startTime = killzone.start.hours * 60 + killzone.start.minutes;
     const endTime = killzone.end.hours * 60 + killzone.end.minutes;
-    return currentTime >= startTime && currentTime <= endTime;
+    return isTimeInRange(currentTime, startTime, endTime);
   });
   
   // If outside all killzones - RED LIGHT
@@ -299,7 +324,7 @@ export const getTradingStatus = (
   const currentMacro = parameters.macros.find(macro => {
     const startTime = macro.start.hours * 60 + macro.start.minutes;
     const endTime = macro.end.hours * 60 + macro.end.minutes;
-    return currentTime >= startTime && currentTime <= endTime;
+    return isTimeInRange(currentTime, startTime, endTime);
   });
   
   if (currentMacro) {

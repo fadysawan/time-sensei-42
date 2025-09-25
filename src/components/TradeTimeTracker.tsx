@@ -1,33 +1,38 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Timeline } from './Timeline';
-import { TrafficLight } from './TrafficLight';
 
-
-import { Button } from '@/components/ui/button';
-import { Settings, Clock, TrendingUp, AlertTriangle, Timer, Zap, Calendar, Target, Newspaper, Activity, Globe, DollarSign } from 'lucide-react';
-import { useTradeTime } from '../hooks/useTradeTime';
+import { TrendingUp, AlertTriangle, Timer, Zap, Calendar, Target, Newspaper, Activity, Globe, DollarSign } from 'lucide-react';
+import { useTradingStatus } from '../contexts/TradingStatusContext';
 import { useTradingParameters } from '../hooks/useTradingParameters';
-import { useStatusNotifications } from '../hooks/useStatusNotifications';
-import { formatCountdownSeconds, getEventTypeStyles, getStatusStyles } from '../utils/timeUtils';
+import { formatCountdownSeconds, formatCountdownSmart, getEventTypeStyles, getStatusStyles } from '../utils/timeUtils';
 
 export const TradeTimeTracker: React.FC = () => {
-  const { parameters, updateParameters, resetParameters } = useTradingParameters();
+  const { parameters } = useTradingParameters();
   const { 
-    currentTime, 
-    newYorkTime, 
+    currentTime,
     tradingStatus, 
     currentPeriod, 
     nextEvent, 
     activeEvents, 
     upcomingEvents, 
     countdown 
-  } = useTradeTime(parameters);
+  } = useTradingStatus();
 
-  // Initialize status notifications hook
-  const { playNotificationSound } = useStatusNotifications(tradingStatus, currentPeriod);
 
   const countdownInfo = formatCountdownSeconds(countdown);
+  
+  // Use smart formatting for main countdown display
+  const countdownMinutes = Math.floor(countdown / 60);
+  const hours = Math.floor(countdownMinutes / 60);
+  const minutes = countdownMinutes % 60;
+  const seconds = countdown % 60;
+  const smartCountdownInfo = formatCountdownSmart(
+    hours, 
+    minutes, 
+    seconds, 
+    false, // showSeconds will be handled by the context
+    countdownMinutes
+  );
   const statusStyles = getStatusStyles(tradingStatus);
 
   // Helper function to get event type icon
@@ -64,6 +69,20 @@ export const TradeTimeTracker: React.FC = () => {
           {activeEvents.map((activeEvent, index) => {
             const eventStyles = getEventTypeStyles(activeEvent.block.type);
             const eventCountdown = formatCountdownSeconds(activeEvent.timeLeft);
+            
+            // Use smart formatting for countdown display
+            const countdownMinutes = Math.floor(activeEvent.timeLeft / 60);
+            const hours = Math.floor(countdownMinutes / 60);
+            const minutes = countdownMinutes % 60;
+            const seconds = activeEvent.timeLeft % 60;
+            const smartCountdown = formatCountdownSmart(
+              hours, 
+              minutes, 
+              seconds, 
+              false, // showSeconds will be handled by the context
+              countdownMinutes
+            );
+            
             return (
               <div key={`active-${index}`} 
                    className={`p-2.5 rounded-md border ${eventStyles.bg} ${eventStyles.border} bg-gradient-to-r from-green-500/5 to-transparent`}>
@@ -90,7 +109,7 @@ export const TradeTimeTracker: React.FC = () => {
                       eventCountdown.isUrgent ? 'text-red-400 animate-pulse' : 
                       eventCountdown.isSoon ? 'text-yellow-400' : 'text-green-400'
                     }`}>
-                      {eventCountdown.display}
+                      {smartCountdown}
                     </span>
                   </div>
                 </div>
@@ -200,6 +219,19 @@ export const TradeTimeTracker: React.FC = () => {
           const countdown = formatCountdownSeconds(event.timeUntilStart);
           const startTime = `${String(event.block.startHour).padStart(2, '0')}:${String(event.block.startMinute).padStart(2, '0')}`;
           
+          // Use smart formatting for countdown display
+          const countdownMinutes = Math.floor(event.timeUntilStart / 60);
+          const hours = Math.floor(countdownMinutes / 60);
+          const minutes = countdownMinutes % 60;
+          const seconds = event.timeUntilStart % 60;
+          const smartCountdown = formatCountdownSmart(
+            hours, 
+            minutes, 
+            seconds, 
+            false, // showSeconds will be handled by the context
+            countdownMinutes
+          );
+          
           return (
             <div 
               key={`upcoming-${index}`}
@@ -237,7 +269,7 @@ export const TradeTimeTracker: React.FC = () => {
                     countdown.isSoon ? 'text-yellow-400' : 
                     'text-blue-400'
                   }`}>
-                    {countdown.display}
+                    {smartCountdown}
                   </div>
                 </div>
               </div>
@@ -266,47 +298,9 @@ export const TradeTimeTracker: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Header with enhanced trading theme */}
-      <header className="sticky top-0 z-40 w-full border-b border-border/50 glass-effect shadow-lg">
-        <div className="container flex h-16 items-center justify-between px-6">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Clock className="h-6 w-6 text-blue-400" />
-              <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Trade Time Tracker
-              </h1>
-            </div>
-            <div className="hidden md:flex items-center space-x-6 text-sm">
-              <div className="flex items-center space-x-2 px-3 py-1 rounded-md bg-blue-500/10 border border-blue-500/20">
-                <span className="text-blue-300">Beirut:</span>
-                <span className="font-mono text-blue-400 font-semibold">{currentTime}</span>
-              </div>
-              <div className="flex items-center space-x-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20">
-                <span className="text-purple-300">New York:</span>
-                <span className="font-mono text-purple-400 font-semibold">{newYorkTime}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <TrafficLight status={tradingStatus} reason={currentPeriod} nextEvent={nextEvent} />
-            <Link to="/settings">
-              <Button
-                variant="outline"
-                size="sm"
-                className="trading-button border-border/50 hover:border-primary/50 hover:bg-primary/10"
-              >
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Settings</span>
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
+    <div>
       {/* Main Timeline */}
-      <main className="container px-6 py-8">
+      <main className="w-full px-6 py-8">
         <div className="space-y-6">
           {/* Current Status and Upcoming Events Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

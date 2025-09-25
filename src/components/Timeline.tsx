@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { TradingParameters, TimeBlock, generateTimeBlocks } from '../utils/tradingLogic';
-import { formatTime } from '../utils/timeUtils';
+import { formatTime, convertUTCToUserTimezone, getTimezoneAbbreviation, calculateDuration } from '../utils/timeUtils';
 
 interface TimelineProps {
   parameters: TradingParameters;
@@ -13,6 +13,171 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
   const currentMinute = parseInt(currentTime.split(':')[1]);
   const currentPosition = ((currentHour * 60 + currentMinute) / (24 * 60)) * 100;
 
+  // Helper function to render timeline blocks, handling overnight ranges
+  const renderTimelineBlocks = (blocks: TimeBlock[], blockType: string) => {
+    return blocks.map((block, index) => {
+      // Convert UTC times to user timezone for positioning
+      const startTime = convertUTCToUserTimezone(block.startHour, block.startMinute, parameters.userTimezone);
+      const endTime = convertUTCToUserTimezone(block.endHour, block.endMinute, parameters.userTimezone);
+      
+      const startMinutes = startTime.hours * 60 + startTime.minutes;
+      const endMinutes = endTime.hours * 60 + endTime.minutes;
+      const isOvernight = endMinutes < startMinutes;
+      
+      if (isOvernight) {
+        // Split overnight block into two parts
+        const firstPartEnd = 24 * 60; // End of day
+        const secondPartStart = 0; // Start of next day
+        const secondPartEnd = endMinutes;
+        
+        const firstPartLeft = (startMinutes / (24 * 60)) * 100;
+        const firstPartWidth = ((firstPartEnd - startMinutes) / (24 * 60)) * 100;
+        const secondPartLeft = 0;
+        const secondPartWidth = (secondPartEnd / (24 * 60)) * 100;
+        
+        return (
+          <React.Fragment key={`${blockType}-${index}`}>
+            {/* First part: from start to end of day */}
+            <div
+              className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
+                         hover:opacity-100 transition-all duration-200 cursor-pointer group rounded-sm
+                         hover:scale-105 hover:z-10`}
+              style={{ left: `${firstPartLeft}%`, width: `${firstPartWidth}%` }}
+            >
+              {firstPartWidth > 6 && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-medium text-white px-1 bg-black/30 rounded truncate">
+                    {block.name}
+                  </span>
+                </div>
+              )}
+              
+              {/* Enhanced tooltip */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                             px-3 py-2 bg-background border border-border text-xs rounded-lg
+                             shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
+                             whitespace-nowrap z-[99999] pointer-events-none
+                             min-w-max">
+                <div className="font-bold text-yellow-400 mb-1 text-sm">{block.name}</div>
+                <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
+                <div className="text-muted-foreground">
+                  {(() => {
+                    const startTime = convertUTCToUserTimezone(block.startHour, block.startMinute, parameters.userTimezone);
+                    const endTime = convertUTCToUserTimezone(block.endHour, block.endMinute, parameters.userTimezone);
+                    return `${formatTime(startTime.hours, startTime.minutes)} - ${formatTime(endTime.hours, endTime.minutes)} (${getTimezoneAbbreviation(parameters.userTimezone)})`;
+                  })()}
+                </div>
+                <div className="text-xs text-muted-foreground/70 mt-1">
+                  Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
+                </div>
+                <div className="text-xs text-purple-400 mt-1">
+                  High Probability Zone
+                </div>
+                
+                {/* Tooltip arrow */}
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 
+                               w-2 h-2 bg-background border-r border-b border-border/50 rotate-45"></div>
+              </div>
+            </div>
+            
+            {/* Second part: from start of next day to end */}
+            <div
+              className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
+                         hover:opacity-100 transition-all duration-200 cursor-pointer group rounded-sm
+                         hover:scale-105 hover:z-10`}
+              style={{ left: `${secondPartLeft}%`, width: `${secondPartWidth}%` }}
+            >
+              {secondPartWidth > 6 && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-medium text-white px-1 bg-black/30 rounded truncate">
+                    {block.name}
+                  </span>
+                </div>
+              )}
+              
+              {/* Enhanced tooltip */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                             px-3 py-2 bg-background border border-border text-xs rounded-lg
+                             shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
+                             whitespace-nowrap z-[99999] pointer-events-none
+                             min-w-max">
+                <div className="font-bold text-yellow-400 mb-1 text-sm">{block.name}</div>
+                <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
+                <div className="text-muted-foreground">
+                  {(() => {
+                    const startTime = convertUTCToUserTimezone(block.startHour, block.startMinute, parameters.userTimezone);
+                    const endTime = convertUTCToUserTimezone(block.endHour, block.endMinute, parameters.userTimezone);
+                    return `${formatTime(startTime.hours, startTime.minutes)} - ${formatTime(endTime.hours, endTime.minutes)} (${getTimezoneAbbreviation(parameters.userTimezone)})`;
+                  })()}
+                </div>
+                <div className="text-xs text-muted-foreground/70 mt-1">
+                  Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
+                </div>
+                <div className="text-xs text-purple-400 mt-1">
+                  High Probability Zone
+                </div>
+                
+                {/* Tooltip arrow */}
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 
+                               w-2 h-2 bg-background border-r border-b border-border/50 rotate-45"></div>
+              </div>
+            </div>
+          </React.Fragment>
+        );
+      } else {
+        // Normal same-day block
+        const left = (startMinutes / (24 * 60)) * 100;
+        const durationMinutes = calculateDuration({ hours: startTime.hours, minutes: startTime.minutes }, { hours: endTime.hours, minutes: endTime.minutes });
+        const width = (durationMinutes / (24 * 60)) * 100;
+        
+        return (
+          <div
+            key={`${blockType}-${index}`}
+            className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
+                       hover:opacity-100 transition-all duration-200 cursor-pointer group rounded-sm
+                       hover:scale-105 hover:z-10`}
+            style={{ left: `${left}%`, width: `${width}%` }}
+          >
+            {width > 6 && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs font-medium text-white px-1 bg-black/30 rounded truncate">
+                  {block.name}
+                </span>
+              </div>
+            )}
+            
+            {/* Enhanced tooltip */}
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
+                           px-3 py-2 bg-background border border-border text-xs rounded-lg
+                           shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
+                           whitespace-nowrap z-[99999] pointer-events-none
+                           min-w-max">
+              <div className="font-bold text-yellow-400 mb-1 text-sm">{block.name}</div>
+              <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
+              <div className="text-muted-foreground">
+                {(() => {
+                  const startTime = convertUTCToUserTimezone(block.startHour, block.startMinute, parameters.userTimezone);
+                  const endTime = convertUTCToUserTimezone(block.endHour, block.endMinute, parameters.userTimezone);
+                  return `${formatTime(startTime.hours, startTime.minutes)} - ${formatTime(endTime.hours, endTime.minutes)} (${getTimezoneAbbreviation(parameters.userTimezone)})`;
+                })()}
+              </div>
+              <div className="text-xs text-muted-foreground/70 mt-1">
+                Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
+              </div>
+              <div className="text-xs text-purple-400 mt-1">
+                High Probability Zone
+              </div>
+              
+              {/* Tooltip arrow */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 
+                             w-2 h-2 bg-background border-r border-b border-border/50 rotate-45"></div>
+            </div>
+          </div>
+        );
+      }
+    });
+  };
+
   const getBlockColor = (type: TimeBlock['type']) => {
     switch (type) {
       case 'macro':
@@ -21,8 +186,14 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
         return 'timeline-killzone';
       case 'premarket':
         return 'bg-yellow-400';
+      case 'market-open':
+        return 'bg-green-500';
       case 'lunch':
         return 'bg-red-400';
+      case 'after-hours':
+        return 'bg-blue-400';
+      case 'custom':
+        return 'bg-purple-500';
       case 'news':
         return 'timeline-news';
       default:
@@ -37,9 +208,15 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
       case 'killzone':
         return `${block.name} Killzone`;
       case 'premarket':
-        return 'Pre-Market';
+        return 'Pre-Market Session';
+      case 'market-open':
+        return 'Market Open Session';
       case 'lunch':
-        return 'Lunch Break';
+        return 'Lunch Break Session';
+      case 'after-hours':
+        return 'After Hours Session';
+      case 'custom':
+        return `Custom Session: ${block.name}`;
       case 'news':
         return `News: ${block.name}`;
       default:
@@ -54,9 +231,9 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
       </div>
       
       {/* Timeline Container with enhanced styling */}
-      <div className="trading-card p-4">
+      <div className="trading-card p-4 pt-4 overflow-visible">
         {/* Hour markers */}
-        <div className="flex justify-between text-xs text-muted-foreground mb-2 mt-8">
+        <div className="flex justify-between text-xs text-muted-foreground mb-2 mt-2 overflow-x-hidden ml-20">
           {Array.from({ length: 25 }, (_, i) => (
             <div key={i} className="text-center" style={{ minWidth: '3ch' }}>
               {i.toString().padStart(2, '0')}
@@ -65,7 +242,22 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
         </div>
         
         {/* Timeline tracks */}
-        <div className="relative space-y-3 overflow-visible mt-4">
+        <div className="relative space-y-3 overflow-visible mt-4 ml-20">
+          {/* Track labels sidebar */}
+          <div className="absolute -left-20 top-0 space-y-3 w-16">
+            <div className="h-8 flex items-center justify-end">
+              <span className="text-xs font-medium text-purple-400">Killzones</span>
+            </div>
+            <div className="h-8 flex items-center justify-end">
+              <span className="text-xs font-medium text-blue-400">Macros</span>
+            </div>
+            <div className="h-8 flex items-center justify-end">
+              <span className="text-xs font-medium text-orange-400">News</span>
+            </div>
+            <div className="h-8 flex items-center justify-end">
+              <span className="text-xs font-medium text-yellow-400">Sessions</span>
+            </div>
+          </div>
           {/* Current time marker - positioned to use the space above timeline */}
           <div
             className="absolute -top-12 bottom-0 w-0.5 bg-gradient-to-b from-blue-400 to-blue-600 z-40 pointer-events-none"
@@ -91,222 +283,22 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
           </div>
           {/* Killzones track */}
           <div className="relative h-8 bg-secondary/30 rounded-md border border-border/30 overflow-visible">
-            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium text-purple-400">
-              Killzones
-            </div>
-            {timeBlocks
-              .filter(block => block.type === 'killzone')
-              .map((block, index) => {
-                const startMinutes = block.startHour * 60 + block.startMinute;
-                const endMinutes = block.endHour * 60 + block.endMinute;
-                const left = (startMinutes / (24 * 60)) * 100;
-                const width = ((endMinutes - startMinutes) / (24 * 60)) * 100;
-                
-                return (
-                  <div
-                    key={`killzone-${index}`}
-                    className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
-                               hover:opacity-100 transition-all duration-200 cursor-pointer group rounded-sm
-                               hover:scale-105 hover:z-10`}
-                    style={{ left: `${left}%`, width: `${width}%` }}
-                  >
-                    {width > 6 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs font-medium text-white px-1 bg-black/30 rounded truncate">
-                          {block.name}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Enhanced tooltip */}
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
-                                   px-3 py-2 glass-effect trading-card text-xs rounded-lg
-                                   shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
-                                   whitespace-nowrap z-[9999] border border-border/50 pointer-events-none">
-                      <div className="font-bold text-purple-400 mb-1 text-sm">{block.name}</div>
-                      <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
-                      <div className="text-muted-foreground">
-                        {formatTime(block.startHour, block.startMinute)} - {formatTime(block.endHour, block.endMinute)}
-                      </div>
-                      <div className="text-xs text-muted-foreground/70 mt-1">
-                        Duration: {Math.round(((block.endHour * 60 + block.endMinute) - (block.startHour * 60 + block.startMinute)) / 60 * 10) / 10}h
-                      </div>
-                      <div className="text-xs text-purple-400 mt-1">
-                        High Probability Zone
-                      </div>
-                      {/* Tooltip arrow */}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 
-                                     w-2 h-2 bg-card border-r border-b border-border/50 rotate-45"></div>
-                    </div>
-                  </div>
-                );
-              })}
+            {renderTimelineBlocks(timeBlocks.filter(block => block.type === 'killzone'), 'killzone')}
           </div>
 
           {/* Macros track */}
           <div className="relative h-8 bg-secondary/30 rounded-md border border-border/30 overflow-visible">
-            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium text-blue-400">
-              Macros
-            </div>
-            {timeBlocks
-              .filter(block => block.type === 'macro')
-              .map((block, index) => {
-                const startMinutes = block.startHour * 60 + block.startMinute;
-                const endMinutes = block.endHour * 60 + block.endMinute;
-                const left = (startMinutes / (24 * 60)) * 100;
-                const width = ((endMinutes - startMinutes) / (24 * 60)) * 100;
-                
-                return (
-                  <div
-                    key={`macro-${index}`}
-                    className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
-                               hover:opacity-100 transition-all duration-200 cursor-pointer group rounded-sm
-                               hover:scale-105 hover:z-10`}
-                    style={{ left: `${left}%`, width: `${width}%` }}
-                  >
-                    {width > 6 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs font-medium text-white px-1 bg-black/30 rounded truncate">
-                          {block.name}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Enhanced tooltip */}
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
-                                   px-3 py-2 glass-effect trading-card text-xs rounded-lg
-                                   shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
-                                   whitespace-nowrap z-[9999] border border-border/50 pointer-events-none">
-                      <div className="font-bold text-blue-400 mb-1 text-sm">{block.name}</div>
-                      <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
-                      <div className="text-muted-foreground">
-                        {formatTime(block.startHour, block.startMinute)} - {formatTime(block.endHour, block.endMinute)}
-                      </div>
-                      <div className="text-xs text-muted-foreground/70 mt-1">
-                        Duration: {Math.round(((block.endHour * 60 + block.endMinute) - (block.startHour * 60 + block.startMinute)) / 60 * 10) / 10}h
-                      </div>
-                      {/* Tooltip arrow */}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 
-                                     w-2 h-2 bg-card border-r border-b border-border/50 rotate-45"></div>
-                    </div>
-                  </div>
-                );
-              })}
+            {renderTimelineBlocks(timeBlocks.filter(block => block.type === 'macro'), 'macro')}
           </div>
 
           {/* News Events track */}
           <div className="relative h-8 bg-secondary/30 rounded-md border border-border/30 overflow-visible">
-            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium text-orange-400">
-              News Events
-            </div>
-            {timeBlocks
-              .filter(block => block.type === 'news')
-              .map((block, index) => {
-                const startMinutes = block.startHour * 60 + block.startMinute;
-                const endMinutes = block.endHour * 60 + block.endMinute;
-                const left = (startMinutes / (24 * 60)) * 100;
-                const width = ((endMinutes - startMinutes) / (24 * 60)) * 100;
-                
-                return (
-                  <div
-                    key={`news-${index}`}
-                    className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
-                               hover:opacity-100 transition-all duration-200 cursor-pointer group rounded-sm
-                               hover:scale-105 hover:z-10`}
-                    style={{ left: `${left}%`, width: `${width}%` }}
-                  >
-                    {width > 6 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs font-medium text-white px-1 bg-black/30 rounded truncate">
-                          {block.name}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Enhanced tooltip */}
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
-                                   px-3 py-2 glass-effect trading-card text-xs rounded-lg
-                                   shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
-                                   whitespace-nowrap z-[9999] border border-border/50 pointer-events-none">
-                      <div className="font-bold text-orange-400 mb-1 text-sm">{block.name}</div>
-                      <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
-                      <div className="text-muted-foreground">
-                        {formatTime(block.startHour, block.startMinute)} - {formatTime(block.endHour, block.endMinute)}
-                      </div>
-                      <div className="text-xs text-muted-foreground/70 mt-1">
-                        Duration: {Math.round(((block.endHour * 60 + block.endMinute) - (block.startHour * 60 + block.startMinute)) / 60 * 10) / 10}h
-                      </div>
-                      <div className="text-xs text-orange-400 mt-1">
-                        High Impact Event
-                      </div>
-                      {/* Tooltip arrow */}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 
-                                     w-2 h-2 bg-card border-r border-b border-border/50 rotate-45"></div>
-                    </div>
-                  </div>
-                );
-              })}
+            {renderTimelineBlocks(timeBlocks.filter(block => block.type === 'news'), 'news')}
           </div>
 
-          {/* Sessions track (Premarket & Lunch) */}
+          {/* Market Sessions track (All types) */}
           <div className="relative h-8 bg-secondary/30 rounded-md border border-border/30 overflow-visible">
-            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-medium text-yellow-400">
-              Sessions
-            </div>
-            {timeBlocks
-              .filter(block => ['premarket', 'lunch'].includes(block.type))
-              .map((block, index) => {
-                const startMinutes = block.startHour * 60 + block.startMinute;
-                const endMinutes = block.endHour * 60 + block.endMinute;
-                const left = (startMinutes / (24 * 60)) * 100;
-                const width = ((endMinutes - startMinutes) / (24 * 60)) * 100;
-                
-                return (
-                  <div
-                    key={`session-${index}`}
-                    className={`absolute top-0 h-full ${getBlockColor(block.type)} opacity-90 
-                               hover:opacity-100 transition-all duration-200 cursor-pointer group rounded-sm
-                               hover:scale-105 hover:z-10`}
-                    style={{ left: `${left}%`, width: `${width}%` }}
-                  >
-                    {width > 6 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs font-medium text-white px-1 bg-black/30 rounded truncate">
-                          {block.name}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Enhanced tooltip */}
-                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
-                                   px-3 py-2 glass-effect trading-card text-xs rounded-lg
-                                   shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-200
-                                   whitespace-nowrap z-[9999] border border-border/50 pointer-events-none">
-                      <div className="font-bold text-yellow-400 mb-1 text-sm">{block.name}</div>
-                      <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
-                      <div className="text-muted-foreground">
-                        {formatTime(block.startHour, block.startMinute)} - {formatTime(block.endHour, block.endMinute)}
-                      </div>
-                      <div className="text-xs text-muted-foreground/70 mt-1">
-                        Duration: {Math.round(((block.endHour * 60 + block.endMinute) - (block.startHour * 60 + block.startMinute)) / 60 * 10) / 10}h
-                      </div>
-                      {block.type === 'premarket' && (
-                        <div className="text-xs text-green-400 mt-1">
-                          Lower Volume Period
-                        </div>
-                      )}
-                      {block.type === 'lunch' && (
-                        <div className="text-xs text-yellow-400 mt-1">
-                          Market Consolidation
-                        </div>
-                      )}
-                      {/* Tooltip arrow */}
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 
-                                     w-2 h-2 bg-card border-r border-b border-border/50 rotate-45"></div>
-                    </div>
-                  </div>
-                );
-              })}
+            {renderTimelineBlocks(timeBlocks.filter(block => ['premarket', 'market-open', 'lunch', 'after-hours', 'custom'].includes(block.type)), 'session')}
           </div>
         </div>
         

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Clock, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { calculateDuration } from '../../utils/timeUtils';
 
 interface TimeRange {
   hours: number;
@@ -267,9 +268,7 @@ export const TimeIntervalPicker: React.FC<TimeIntervalPickerProps> = ({
               <div className="text-xs text-muted-foreground">Duration</div>
               <div className="font-medium">
                 {(() => {
-                  const startMinutes = tempStartTime.hours * 60 + tempStartTime.minutes;
-                  const endMinutes = tempEndTime.hours * 60 + tempEndTime.minutes;
-                  const duration = endMinutes - startMinutes;
+                  const duration = calculateDuration(tempStartTime, tempEndTime);
                   const hours = Math.floor(duration / 60);
                   const minutes = duration % 60;
                   return `${hours}h ${minutes}m`;

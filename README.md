@@ -12,9 +12,10 @@ Visit the live application: [https://khsawan.github.io/time-sensei-42/](https://
 - **ICT Macro Tracking**: 8 daily macro sessions for precise entry timing  
 - **Killzone Monitoring**: London and New York killzone periods
 - **Real-time Timeline**: Interactive 24-hour visualization of all trading periods
-- **Beirut Time Zone**: All sessions calibrated to GMT+2
+- **Global Timezone Support**: All sessions stored in UTC, displayed in your local timezone
+- **Multi-Timezone Display**: Shows current time in UTC, local, New York, and London
 - **News Event Alerts**: High-impact news event notifications
-- **Customizable Settings**: Adjustable trading parameters
+- **Customizable Settings**: Adjustable trading parameters and timezone preferences
 
 ## Project info
 
