@@ -1,19 +1,19 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { NextEventsPanel } from './NextEventsPanel';
-import { getNextMacro, getNextKillzone, getNextNewsEvent } from '../utils/tradingLogic';
-import { TradingParameters } from '../models';
-import { convertUTCToUserTimezone } from '../utils/timeUtils';
+import { NextEventsPanel } from '../NextEventsPanel';
+import { getNextMacro, getNextKillzone, getNextNewsEvent } from '../../utils/tradingLogic';
+import { TradingParameters } from '../../models';
+import { convertUTCToUserTimezone } from '../../utils/timeUtils';
 
 // Mock the trading logic functions
-jest.mock('../utils/tradingLogic', () => ({
+jest.mock('../../utils/tradingLogic', () => ({
   getNextMacro: jest.fn(),
   getNextKillzone: jest.fn(),
   getNextNewsEvent: jest.fn(),
 }));
 
 // Mock the time utilities
-jest.mock('../utils/timeUtils', () => ({
+jest.mock('../../utils/timeUtils', () => ({
   getBeirutTime: jest.fn(() => ({ hours: 10, minutes: 30, seconds: 0, formatted: '10:30:00' })),
   getUTCTime: jest.fn(() => ({ hours: 7, minutes: 30, seconds: 0, formatted: '07:30:00' })),
   formatCountdownDetailed: jest.fn((minutes) => ({
@@ -35,7 +35,7 @@ jest.mock('../utils/timeUtils', () => ({
 }));
 
 // Mock UI components
-jest.mock('../components/ui/collapsible', () => ({
+jest.mock('../../components/ui/collapsible', () => ({
   Collapsible: ({ children }: { children: React.ReactNode }) => <div data-testid="collapsible">{children}</div>,
   CollapsibleContent: ({ children }: { children: React.ReactNode }) => <div data-testid="collapsible-content">{children}</div>,
   CollapsibleTrigger: ({ children }: { children: React.ReactNode }) => <div data-testid="collapsible-trigger">{children}</div>,
