@@ -197,10 +197,10 @@ export const generateTimeBlocks = (parameters: TradingParameters): TimeBlock[] =
         blocks.push({
           type: 'news',
           name: instance.name,
-          startHour: scheduledTime.getHours(),
-          startMinute: scheduledTime.getMinutes(),
-          endHour: scheduledTime.getHours(),
-          endMinute: scheduledTime.getMinutes() + template.cooldownMinutes
+          startHour: scheduledTime.getUTCHours(),
+          startMinute: scheduledTime.getUTCMinutes(),
+          endHour: scheduledTime.getUTCHours(),
+          endMinute: scheduledTime.getUTCMinutes() + template.cooldownMinutes
         });
       }
     });
@@ -477,7 +477,7 @@ export const getNextNewsEvent = (currentHour: number, currentMinute: number, par
     })
     .filter(instance => {
       const scheduledTime = new Date(instance.scheduledTime);
-      const eventTime = scheduledTime.getHours() * 60 + scheduledTime.getMinutes();
+      const eventTime = scheduledTime.getUTCHours() * 60 + scheduledTime.getUTCMinutes();
       return eventTime > currentTime;
     });
   
@@ -488,11 +488,11 @@ export const getNextNewsEvent = (currentHour: number, currentMinute: number, par
     })[0];
     
     const scheduledTime = new Date(nextInstance.scheduledTime);
-    const eventTime = scheduledTime.getHours() * 60 + scheduledTime.getMinutes();
+    const eventTime = scheduledTime.getUTCHours() * 60 + scheduledTime.getUTCMinutes();
     
     return {
       name: nextInstance.name,
-      startTime: { hours: scheduledTime.getHours(), minutes: scheduledTime.getMinutes() },
+      startTime: { hours: scheduledTime.getUTCHours(), minutes: scheduledTime.getUTCMinutes() },
       timeUntilMinutes: eventTime - currentTime,
       impact: nextInstance.impact
     };

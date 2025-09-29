@@ -1,5 +1,6 @@
 // NewsService - Single Responsibility: Handle news template and instance management
 import { NewsTemplate, NewsInstance, NewsImpact } from '../models';
+import { convertLocalDateTimeToUTC, formatUTCDateForUserTimezone } from '../utils/timeUtils';
 
 export class NewsService {
   // Default news templates that come with the application
@@ -73,6 +74,27 @@ export class NewsService {
       templateId: template.id,
       name: overrides?.name || template.name,
       scheduledTime,
+      impact: template.impact, // Use template impact, no override allowed
+      isActive: true,
+      description: overrides?.description || template.description
+    };
+  }
+
+  // Create a new news instance with timezone conversion
+  static createNewsInstanceWithTimezone(
+    template: NewsTemplate, 
+    localDateTime: string,
+    userTimezone: string,
+    overrides?: Partial<Pick<NewsInstance, 'name' | 'description'>>
+  ): NewsInstance {
+    // Convert user's local datetime to UTC
+    const utcScheduledTime = convertLocalDateTimeToUTC(localDateTime, userTimezone);
+    
+    return {
+      id: `${template.id}_${Date.now()}`,
+      templateId: template.id,
+      name: overrides?.name || template.name,
+      scheduledTime: utcScheduledTime,
       impact: template.impact, // Use template impact, no override allowed
       isActive: true,
       description: overrides?.description || template.description
@@ -203,5 +225,21 @@ export class NewsService {
           borderColor: 'border-yellow-500/30'
         };
     }
+  }
+
+  // Format news instance for display with timezone conversion
+  static formatNewsInstanceForDisplay(instance: NewsInstance, userTimezone: string): {
+    instance: NewsInstance;
+    displayTime: string;
+    isPast: boolean;
+  } {
+    const displayTime = formatUTCDateForUserTimezone(instance.scheduledTime, userTimezone);
+    const isPast = instance.scheduledTime < new Date();
+    
+    return {
+      instance,
+      displayTime,
+      isPast
+    };
   }
 }

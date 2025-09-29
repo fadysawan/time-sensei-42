@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, Calendar, Zap, ChevronDown, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { TradingParameters } from '../models';
+import { TradingParameters, MacroSession, KillzoneSession, NewsInstance } from '../models';
 import { getNextMacro, getNextKillzone, getNextNewsEvent, NextEvent } from '../utils/tradingLogic';
 import { getBeirutTime, formatCountdownDetailed, formatTime, convertUTCToUserTimezone, getUTCTime } from '../utils/timeUtils';
 import { useUserConfiguration } from '../contexts/UserConfigurationContext';
@@ -183,9 +183,23 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
     
     return events
       .map(event => {
-        const time = timeField === 'start' ? event.start : event.time;
-        const startTime = time.hours * 60 + time.minutes;
-        const timeUntil = startTime - (utcTime.hours * 60 + utcTime.minutes);
+        let time: { hours: number; minutes: number };
+        let startTime: number;
+        let timeUntil: number;
+        
+        if (timeField === 'scheduledTime' && 'scheduledTime' in event) {
+          // Handle NewsInstance
+          const scheduledDate = new Date(event.scheduledTime);
+          time = { hours: scheduledDate.getUTCHours(), minutes: scheduledDate.getUTCMinutes() };
+          startTime = time.hours * 60 + time.minutes;
+          timeUntil = startTime - (utcTime.hours * 60 + utcTime.minutes);
+        } else {
+          // Handle MacroSession and KillzoneSession
+          const macroOrKillzone = event as MacroSession | KillzoneSession;
+          time = timeField === 'start' ? macroOrKillzone.start : macroOrKillzone.end;
+          startTime = time.hours * 60 + time.minutes;
+          timeUntil = startTime - (utcTime.hours * 60 + utcTime.minutes);
+        }
         
         // Convert UTC time to user timezone for display
         const userTime = convertUTCToUserTimezone(time.hours, time.minutes, parameters.userTimezone);
@@ -194,8 +208,8 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
           name: event.name,
           startTime: userTime,
           timeUntilMinutes: timeUntil > 0 ? timeUntil : timeUntil + 24 * 60,
-          region: event.region,
-          impact: event.impact
+          region: 'region' in event ? event.region : undefined,
+          impact: 'impact' in event ? event.impact : undefined
         };
       })
       .filter(event => event.timeUntilMinutes > currentEventTime)
@@ -211,9 +225,23 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
     
     return events
       .map(event => {
-        const time = timeField === 'start' ? event.start : event.time;
-        const startTime = time.hours * 60 + time.minutes;
-        const timeUntil = startTime - (utcTime.hours * 60 + utcTime.minutes);
+        let time: { hours: number; minutes: number };
+        let startTime: number;
+        let timeUntil: number;
+        
+        if (timeField === 'scheduledTime' && 'scheduledTime' in event) {
+          // Handle NewsInstance
+          const scheduledDate = new Date(event.scheduledTime);
+          time = { hours: scheduledDate.getUTCHours(), minutes: scheduledDate.getUTCMinutes() };
+          startTime = time.hours * 60 + time.minutes;
+          timeUntil = startTime - (utcTime.hours * 60 + utcTime.minutes);
+        } else {
+          // Handle MacroSession and KillzoneSession
+          const macroOrKillzone = event as MacroSession | KillzoneSession;
+          time = timeField === 'start' ? macroOrKillzone.start : macroOrKillzone.end;
+          startTime = time.hours * 60 + time.minutes;
+          timeUntil = startTime - (utcTime.hours * 60 + utcTime.minutes);
+        }
         
         // Convert UTC time to user timezone for display
         const userTime = convertUTCToUserTimezone(time.hours, time.minutes, parameters.userTimezone);
@@ -222,8 +250,8 @@ export const NextEventsPanel: React.FC<NextEventsPanelProps> = ({ parameters }) 
           name: event.name,
           startTime: userTime,
           timeUntilMinutes: timeUntil > 0 ? timeUntil : timeUntil + 24 * 60,
-          region: event.region,
-          impact: event.impact
+          region: 'region' in event ? event.region : undefined,
+          impact: 'impact' in event ? event.impact : undefined
         };
       })
       .filter(event => event.timeUntilMinutes > currentEventTime)

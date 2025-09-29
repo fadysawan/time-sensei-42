@@ -532,6 +532,114 @@ export const formatCountdownDetailed = (totalMinutes: number, showSeconds?: bool
   };
 };
 
+// Convert datetime-local input (user timezone) to UTC Date object
+export const convertLocalDateTimeToUTC = (localDateTime: string, userTimezone: string): Date => {
+  try {
+    if (!localDateTime) {
+      console.warn('DateTime string is required');
+      return new Date();
+    }
+
+    // If userTimezone is UTC, return the date as-is
+    if (userTimezone === 'UTC') {
+      return new Date(localDateTime);
+    }
+
+    // Parse the datetime string
+    const [datePart, timePart] = localDateTime.split('T');
+    if (!datePart || !timePart) {
+      console.warn('Invalid datetime format:', localDateTime);
+      return new Date(localDateTime);
+    }
+    
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hours, minutes] = timePart.split(':').map(Number);
+    
+    // Validate the parsed values
+    if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(hours) || isNaN(minutes)) {
+      console.warn('Invalid datetime values:', { year, month, day, hours, minutes });
+      return new Date(localDateTime);
+    }
+    
+    // Use a much simpler and more reliable approach:
+    // Create the date as if it's in UTC, then apply timezone offset
+    
+    // Create a UTC date with the given time components
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0, 0));
+    
+    // Now we need to adjust for the timezone difference
+    // Get current date to calculate timezone offset
+    const now = new Date();
+    const currentUtc = new Date(now.toLocaleString("en-US", {timeZone: "UTC"}));
+    const currentUserTz = new Date(now.toLocaleString("en-US", {timeZone: userTimezone}));
+    const offsetMinutes = (currentUserTz.getTime() - currentUtc.getTime()) / (1000 * 60);
+    
+    // Adjust the UTC date by subtracting the user's timezone offset
+    // This converts "local time in user timezone" to actual UTC
+    const adjustedUtcDate = new Date(utcDate.getTime() - (offsetMinutes * 60 * 1000));
+    
+    
+    return adjustedUtcDate;
+  } catch (error) {
+    console.warn('Error converting local datetime to UTC:', error);
+    return new Date(localDateTime);
+  }
+};
+
+
+// Format UTC date for display in user timezone
+export const formatUTCDateForUserTimezone = (utcDate: Date, userTimezone: string): string => {
+  try {
+    // Validate inputs and ensure we have a proper Date object
+    if (!utcDate) {
+      console.warn('No UTC date provided');
+      return 'No Date';
+    }
+    
+    // Convert to Date object if it's a string
+    const dateObj = utcDate instanceof Date ? utcDate : new Date(utcDate);
+    
+    if (isNaN(dateObj.getTime())) {
+      console.warn('Invalid UTC date provided:', utcDate);
+      return 'Invalid Date';
+    }
+    
+    if (!userTimezone) {
+      console.warn('User timezone is required');
+      return 'Invalid Timezone';
+    }
+    
+    // Use Intl.DateTimeFormat with timeZone option for proper timezone conversion
+    const formatted = new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: userTimezone
+    }).format(dateObj);
+    
+    
+    return formatted;
+  } catch (error) {
+    console.warn('Error formatting UTC date for user timezone:', error);
+    // Fallback to UTC formatting
+    try {
+      const dateObj = utcDate instanceof Date ? utcDate : new Date(utcDate);
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(dateObj);
+    } catch (fallbackError) {
+      console.warn('Fallback formatting also failed:', fallbackError);
+      return 'Date Error';
+    }
+  }
+};
+
 // Re-export functions from other modules for convenience
 export const formatCountdownSeconds = CountdownService.formatCountdownSeconds;
 export { getEventTypeStyles, getStatusStyles };

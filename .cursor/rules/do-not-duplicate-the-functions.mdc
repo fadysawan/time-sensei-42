@@ -1,0 +1,5 @@
+---
+description: Keep the utility function that the project has documented in a technical document folder and scan it before adding a new utility function in order to make sure not to implement he same function twice.
+globs: /.tsx
+alwaysApply: true
+---

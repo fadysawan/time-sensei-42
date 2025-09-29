@@ -1,0 +1,5 @@
+---
+description: Run ESLintning after every code change
+globs: /.tsx
+alwaysApply: true
+---

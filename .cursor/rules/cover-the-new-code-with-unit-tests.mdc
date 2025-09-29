@@ -1,0 +1,5 @@
+---
+description: Make sure to cover the new code with unit tests.
+globs: /.tsx
+alwaysApply: true
+---

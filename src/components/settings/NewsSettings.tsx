@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { NewsTemplate, NewsInstance, NewsImpact } from '../../models';
 import { NewsService } from '../../services';
-import { getTimezoneAbbreviation } from '../../utils/timeUtils';
+import { getTimezoneAbbreviation, formatUTCDateForUserTimezone } from '../../utils/timeUtils';
 
 interface NewsSettingsProps {
   newsTemplates: NewsTemplate[];
@@ -55,12 +55,16 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
     const template = availableTemplates.find(t => t.id === selectedTemplate);
     if (!template || !instanceForm.datetime) return;
 
-    const scheduledDateTime = new Date(instanceForm.datetime);
-    
-    const newInstance = NewsService.createNewsInstance(template, scheduledDateTime, {
-      name: instanceForm.name || template.name,
-      description: instanceForm.description || template.description
-    });
+    // Use the new timezone-aware method to create the instance
+    const newInstance = NewsService.createNewsInstanceWithTimezone(
+      template, 
+      instanceForm.datetime, 
+      userTimezone,
+      {
+        name: instanceForm.name || template.name,
+        description: instanceForm.description || template.description
+      }
+    );
 
     const validation = NewsService.validateNewsInstance(newInstance);
     if (!validation.isValid) {
@@ -101,14 +105,10 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
     }
   };
 
-  const formatDateTime = (date: Date): string => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).format(new Date(date));
+  const formatDateTime = (date: Date | string): string => {
+    // Ensure we have a proper Date object
+    const dateObj = date instanceof Date ? date : new Date(date);
+    return formatUTCDateForUserTimezone(dateObj, userTimezone);
   };
 
   // Template management functions
@@ -229,11 +229,22 @@ export const NewsSettings: React.FC<NewsSettingsProps> = ({
     resetTemplateForm();
   };
 
-  // Generate current datetime in local format for datetime-local input
+  // Generate current datetime in user timezone format for datetime-local input
   const getCurrentDateTime = () => {
     const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    return now.toISOString().slice(0, 16);
+    if (userTimezone === 'UTC') {
+      return now.toISOString().slice(0, 16);
+    }
+    
+    // Convert current UTC time to user timezone for the input
+    const userDate = new Date(now.toLocaleString("en-US", {timeZone: userTimezone}));
+    const year = userDate.getFullYear();
+    const month = String(userDate.getMonth() + 1).padStart(2, '0');
+    const day = String(userDate.getDate()).padStart(2, '0');
+    const hours = String(userDate.getHours()).padStart(2, '0');
+    const minutes = String(userDate.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
   return (
