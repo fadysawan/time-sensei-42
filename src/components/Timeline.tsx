@@ -62,11 +62,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
                 <div className="font-bold text-yellow-400 mb-1 text-sm">{block.name}</div>
                 <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
                 <div className="text-muted-foreground">
-                  {(() => {
-                    const startTime = convertUTCToUserTimezone(block.startHour, block.startMinute, parameters.userTimezone);
-                    const endTime = convertUTCToUserTimezone(block.endHour, block.endMinute, parameters.userTimezone);
-                    return `${formatTime(startTime.hours, startTime.minutes)} - ${formatTime(endTime.hours, endTime.minutes)} (${getTimezoneAbbreviation(parameters.userTimezone)})`;
-                  })()}
+                  {`${formatTime(startTime.hours, startTime.minutes)} - ${formatTime(endTime.hours, endTime.minutes)} (${getTimezoneAbbreviation(parameters.userTimezone)})`}
                 </div>
                 <div className="text-xs text-muted-foreground/70 mt-1">
                   Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
@@ -105,11 +101,7 @@ export const Timeline: React.FC<TimelineProps> = ({ parameters, currentTime }) =
                 <div className="font-bold text-yellow-400 mb-1 text-sm">{block.name}</div>
                 <div className="text-xs text-muted-foreground/80 mb-1">{getBlockLabel(block)}</div>
                 <div className="text-muted-foreground">
-                  {(() => {
-                    const startTime = convertUTCToUserTimezone(block.startHour, block.startMinute, parameters.userTimezone);
-                    const endTime = convertUTCToUserTimezone(block.endHour, block.endMinute, parameters.userTimezone);
-                    return `${formatTime(startTime.hours, startTime.minutes)} - ${formatTime(endTime.hours, endTime.minutes)} (${getTimezoneAbbreviation(parameters.userTimezone)})`;
-                  })()}
+                  {`${formatTime(startTime.hours, startTime.minutes)} - ${formatTime(endTime.hours, endTime.minutes)} (${getTimezoneAbbreviation(parameters.userTimezone)})`}
                 </div>
                 <div className="text-xs text-muted-foreground/70 mt-1">
                   Duration: {Math.round(calculateDuration({ hours: block.startHour, minutes: block.startMinute }, { hours: block.endHour, minutes: block.endMinute }) / 60 * 10) / 10}h
