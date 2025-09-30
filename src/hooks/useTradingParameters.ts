@@ -6,7 +6,6 @@ import { TradingParameters } from '../models';
 // Combined hook that provides both user configuration and trading data
 // This maintains backward compatibility with existing components
 export const useTradingParameters = () => {
-  console.log('🎯 useTradingParameters: hook called');
   const { 
     config: userConfig, 
     updateTimezone, 
@@ -23,12 +22,6 @@ export const useTradingParameters = () => {
   const prevKillzonesRef = useRef(tradingData.killzones);
   useEffect(() => {
     if (prevKillzonesRef.current !== tradingData.killzones) {
-      console.log('🔄 useTradingParameters: killzones dependency changed', {
-        prev: prevKillzonesRef.current,
-        current: tradingData.killzones,
-        prevLength: prevKillzonesRef.current?.length,
-        currentLength: tradingData.killzones?.length
-      });
       prevKillzonesRef.current = tradingData.killzones;
     }
   }, [tradingData.killzones]);
@@ -36,13 +29,6 @@ export const useTradingParameters = () => {
   // Combine user config and trading data into the old TradingParameters format
   // Use useMemo to ensure the parameters object only changes when the underlying data changes
   const parameters: TradingParameters = useMemo(() => {
-    console.log('📊 useTradingParameters: parameters object recreated', {
-      killzonesCount: tradingData.killzones.length,
-      killzones: tradingData.killzones.map(k => ({ name: k.name, start: k.start, end: k.end })),
-      killzonesReference: tradingData.killzones,
-      macrosReference: tradingData.macros
-    });
-    
     return {
       macros: tradingData.macros,
       killzones: tradingData.killzones,

@@ -140,11 +140,6 @@ export const useStatusNotifications = (currentStatus: TradingStatus, currentPeri
 
   // Monitor status changes
   useEffect(() => {
-    console.log('🔍 useStatusNotifications: checking status change', {
-      previousStatus: previousStatus.current,
-      currentStatus,
-      hasChanged: previousStatus.current !== null && previousStatus.current !== currentStatus
-    });
     
     if (previousStatus.current !== null && previousStatus.current !== currentStatus) {
       const statusChange: StatusChange = {
@@ -153,7 +148,6 @@ export const useStatusNotifications = (currentStatus: TradingStatus, currentPeri
         timestamp: new Date()
       };
 
-      console.log('🔄 Trading Status Changed:', statusChange.from, '→', statusChange.to);
 
       // Get message details
       const messageDetails = getStatusMessage(currentStatus, currentPeriod);
@@ -184,7 +178,6 @@ export const useStatusNotifications = (currentStatus: TradingStatus, currentPeri
         // Play notification sound
         playNotificationSound(currentStatus);
         
-        console.log('✅ Notification shown for:', currentStatus, messageDetails.title);
       } catch (error) {
         console.error('❌ Error showing notification:', error);
       }

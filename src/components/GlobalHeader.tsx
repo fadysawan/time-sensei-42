@@ -1,17 +1,20 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Clock, Settings, Globe, MapPin, Building2, Sun, Moon } from 'lucide-react';
+import { Clock, Settings, Globe, MapPin, Building2, Sun, Moon, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TrafficLight } from './TrafficLight';
+import { UserMenu } from './auth/UserMenu';
 import { useTradingStatus } from '../contexts/TradingStatusContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useUserConfiguration } from '../contexts/UserConfigurationContext';
+import { useAuth } from '../hooks/useAuth';
 
 export const GlobalHeader: React.FC = () => {
   const location = useLocation();
   const { currentTime, utcTime, newYorkTime, londonTime, tokyoTime, currentDate, utcDate, newYorkDate, londonDate, tokyoDate, tradingStatus, currentPeriod, nextEvent } = useTradingStatus();
   const { theme, resolvedTheme } = useTheme();
   const { config, updateDisplayPreferences } = useUserConfiguration();
+  const { currentUser } = useAuth();
   
   const isSettingsPage = location.pathname === '/settings';
 
@@ -198,6 +201,22 @@ export const GlobalHeader: React.FC = () => {
               >
                 <Settings className="h-4 w-4" />
                 <span className="hidden sm:inline">Settings</span>
+              </Button>
+            </Link>
+          )}
+
+          {/* Authentication Section */}
+          {currentUser ? (
+            <UserMenu />
+          ) : (
+            <Link to="/login">
+              <Button
+                variant="outline"
+                size="sm"
+                className="trading-button border-border/50 hover:border-primary/50 hover:bg-primary/10"
+              >
+                <LogIn className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign In</span>
               </Button>
             </Link>
           )}

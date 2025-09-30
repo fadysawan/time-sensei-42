@@ -63,19 +63,8 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
     _timestamp: (parameters as TradingParameters & { _timestamp?: number })._timestamp || 0
   });
   
-  console.log('🔍 TradingStatusProvider: checking parameters change', {
-    currentString: parametersRef.current.substring(0, 100) + '...',
-    newString: parametersString.substring(0, 100) + '...',
-    isEqual: parametersRef.current === parametersString,
-    timestamp: new Date().toISOString()
-  });
   
   if (parametersRef.current !== parametersString) {
-    console.log('🎯 TradingStatusProvider: PARAMETERS CHANGED!', {
-      killzonesCount: parameters.killzones.length,
-      killzones: parameters.killzones.map(k => ({ name: k.name, start: k.start, end: k.end })),
-      timestamp: new Date().toISOString()
-    });
     parametersRef.current = parametersString;
   }
   const [tradingStatus, setTradingStatus] = useState<TradingStatus>('red');
@@ -97,11 +86,6 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
 
   // Complete update function with all logic - made stable with useCallback
   const updateTime = useCallback(() => {
-    console.log('🔄 TradingStatusContext: updateTime called', {
-      killzones: parameters.killzones.length,
-      macros: parameters.macros.length,
-      currentTime: new Date().toISOString()
-    });
     
     // Get UTC time (internal reference)
     const utcTimeInfo = getUTCTime();
@@ -119,31 +103,6 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
       parameters
     );
     
-    console.log('📈 TradingStatus calculation result:', {
-      currentTime: `${utcTimeInfo.hours}:${utcTimeInfo.minutes.toString().padStart(2, '0')}`,
-      currentTimeMinutes: utcTimeInfo.hours * 60 + utcTimeInfo.minutes,
-      status: status.status,
-      period: status.period,
-      previousStatus: tradingStatus,
-      killzonesCount: parameters.killzones.length,
-      killzones: parameters.killzones.map(k => ({
-        name: k.name,
-        start: `${k.start.hours}:${k.start.minutes.toString().padStart(2, '0')}`,
-        startMinutes: k.start.hours * 60 + k.start.minutes,
-        end: `${k.end.hours}:${k.end.minutes.toString().padStart(2, '0')}`,
-        endMinutes: k.end.hours * 60 + k.end.minutes,
-        isCurrentlyInside: (() => {
-          const currentTimeMinutes = utcTimeInfo.hours * 60 + utcTimeInfo.minutes;
-          const startTimeMinutes = k.start.hours * 60 + k.start.minutes;
-          const endTimeMinutes = k.end.hours * 60 + k.end.minutes;
-          // Handle overnight ranges - using exclusive end time
-          if (startTimeMinutes > endTimeMinutes) {
-            return currentTimeMinutes >= startTimeMinutes || currentTimeMinutes < endTimeMinutes;
-          }
-          return currentTimeMinutes >= startTimeMinutes && currentTimeMinutes < endTimeMinutes;
-        })()
-      }))
-    });
     
     setTradingStatus(status.status);
     setCurrentPeriod(status.period);
@@ -286,11 +245,6 @@ export const TradingStatusProvider: React.FC<TradingStatusProviderProps> = ({
 
   // Log when updateTime callback is recreated due to dependencies changing
   useEffect(() => {
-    console.log('🆕 UPDATETIME CALLBACK RECREATED - PARAMETERS CHANGED!', {
-      parametersRef: parameters,
-      killzonesCount: parameters.killzones.length,
-      timestamp: new Date().toISOString()
-    });
   }, [parameters, config.displayPreferences]);
 
   // Function to refresh status immediately
